@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>人机验证 · 注册登录原型</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="with-nav">
+<div class="proto">
+  <div class="proto-head">
+    <p class="muted" style="margin:0">原型页面 › 前台页面</p>
+    <h1>人机验证</h1>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="sb"><span>9:41</span><span>5G ▮▮▮</span></div>
+    <section class="view">
+      <div class="topbar"><a class="back" href="login.html" aria-label="返回">‹</a>Security check</div>
+      <p class="hint" id="why"></p>
+
+      <div id="t1" hidden>
+        <div class="cf"><div class="spin"></div><div><b>Verifying...</b><br><small>Cloudflare Turnstile</small></div></div>
+      </div>
+
+      <div id="t2" hidden style="display:grid;gap:10px">
+        <p class="hint" style="margin:0">Drag the slider to complete the puzzle</p>
+        <div class="slider"><div class="track">→ Slide to verify</div><button type="button" id="slide" aria-label="拖动滑块">⇢</button></div>
+      </div>
+
+      <div id="t0" hidden style="display:grid;gap:8px">
+        <label class="hint" for="code">Enter the code in the picture</label>
+        <div class="imgcode"><div class="inp" id="code-box" style="flex:1"><input id="code" inputmode="numeric" maxlength="4" placeholder="4 digits"></div><div class="pic" id="pic" title="点击刷新">4831</div></div>
+        <div class="err" id="code-err"></div>
+        <button class="btn" id="code-ok">Confirm</button>
+      </div>
+
+      <button class="btn ghost" id="cancel">Cancel</button>
+    </section>
+    <div class="toast" id="toast" hidden></div>
+  </div></div>
+
+  <aside class="notes" aria-label="规则批注">
+    <h2>规则批注</h2>
+    <p class="sub">对应 PRD 功能点 F03。<a href="../../docs/prd.html#pg-F03">查看 PRD</a></p>
+    <ol>
+      <li><span class="fp">F03-01</span>验证码登录：点 Send code 后、发短信前触发；H5 绑定手机号也要过人机。<span class="ref">-5457</span></li>
+      <li><span class="fp">F03-01</span>类型由后台 <code>captchaType</code> 决定：1 = Cloudflare，2 = 腾讯滑块，0 或其他 = 数字图形码。<span class="ref">-816</span></li>
+      <li><span class="fp">F03-01</span>通过后自动发送短信，不需要再点一次；失败或取消时不发短信，返回登录页也不报验证码必填。<span class="ref">-727 -3536</span></li>
+      <li><span class="fp">F03-01</span>图形码不足 4 位提示 "Please enter 4-digit verification code"。<span class="ref">-2383</span></li>
+      <li><span class="fp">F03-02</span>密码登录命中风险规则（如 5 分钟内失败 ≥ 3 次）时触发图片验证，触发原因要落库。<span class="ref">平台知识库 4.1</span></li>
+      <li><span class="fp">F03-02</span><span class="warn-3">※ Cloudflare 不可用时不会自动切换（相关需求已被否决），只能运营手动改 captchaType。</span><span class="ref">-3866 -4044</span></li>
+    </ol>
+    <h3>模拟操作</h3>
+    <div class="sim">
+      <label>后台 captchaType <select id="sim-type"><option value="1">1 · Cloudflare</option><option value="2">2 · 腾讯滑块</option><option value="0">0 · 数字图形码</option></select></label>
+      <button type="button" id="sim-fail"><span class="simtag">模拟</span>验证失败</button>
+      <p class="muted" style="margin:0;font-size:.85rem">数字图形码的正确值为图片上的 4831（模拟）。</p>
+    </div>
+    <div class="pager"><a href="login.html">← 上一页：登录注册页</a><a href="otp.html">下一页：短信验证码 →</a></div>
+  </aside>
+</div>
+</div>
+<script>window.NAV_ROOT = "../../";</script>
+<script src="../../assets/nav-data.js"></script>
+<script src="../../assets/nav.js"></script>
+<script src="../../assets/proto.js"></script>
+<script>
+var $ = function (id) { return document.getElementById(id); };
+var mode = P.get("captchaMode");
+var type = String(P.get("captchaType"));
+var timer = null;
+var backTo = { login: "login.html", bind: "bind-phone.html", forgot: "forgot-password.html" }[P.get("otpPurpose")] || "login.html";
+if (mode === "risk") backTo = "login.html";
+document.querySelector(".back").href = backTo;
+$("why").textContent = mode === "risk"
+  ? "Unusual login activity detected. Please complete the check."
+  : "Please complete the check before we send the code.";
+
+function pass() {
+  if (mode === "risk") {
+    P.set("pwdFails", 0); P.set("captchaMode", "otp");
+    P.toast("Verification passed. Please log in again."); P.go("login.html", 900); return;
+  }
+  P.set("otpEnd", Date.now() + 45000); P.set("otpTries", 5); P.set("justSent", true);
+  P.go("otp.html", 300);
+}
+function show(t) {
+  clearTimeout(timer);
+  ["t0", "t1", "t2"].forEach(function (id) { $(id).hidden = id !== "t" + t; });
+  $("t2").style.display = t === "2" ? "grid" : "none";
+  $("t0").style.display = t === "0" ? "grid" : "none";
+  if (t === "1") timer = setTimeout(pass, 1600);
+}
+$("slide").onclick = function () { $("slide").style.left = "calc(100% - 42px)"; setTimeout(pass, 500); };
+$("pic").onclick = function () { P.toast("Picture refreshed（模拟）"); };
+$("code").addEventListener("input", function () { this.value = this.value.replace(/\D/g, ""); $("code-err").textContent = ""; $("code-box").classList.remove("bad"); });
+$("code-ok").onclick = function () {
+  var v = $("code").value;
+  if (v.length < 4) { $("code-err").textContent = "Please enter 4-digit verification code"; $("code-box").classList.add("bad"); return; }
+  if (v !== "4831") { $("code-err").textContent = "Incorrect code. Please try again."; $("code").value = ""; return; }
+  pass();
+};
+$("cancel").onclick = function () { clearTimeout(timer); P.go(backTo); };
+$("sim-type").value = type;
+$("sim-type").onchange = function () { type = this.value; P.set("captchaType", Number(type)); show(type); };
+$("sim-fail").onclick = function () { clearTimeout(timer); P.toast("Verification failed. No code was sent."); P.go(backTo, 1200); };
+show(type);
+</script>
+</body>
+</html>

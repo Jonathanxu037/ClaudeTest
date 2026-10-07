@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>三方登录绑定手机号 · 注册登录原型</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="with-nav">
+<div class="proto">
+  <div class="proto-head">
+    <p class="muted" style="margin:0">原型页面 › 前台页面</p>
+    <h1>三方登录绑定手机号</h1>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="sb"><span>9:41</span><span>5G ▮▮▮</span></div>
+    <section class="view">
+      <div class="topbar"><a class="back" href="home.html" aria-label="返回">‹</a>Link mobile number</div>
+      <div class="card-app"><b id="who">Logged in with Google</b><span class="hint">Link your mobile number to withdraw and to set a login password.</span></div>
+      <div class="field">
+        <label for="phone">Mobile number</label>
+        <div class="inp" id="phone-box"><span class="pre">+63</span><input id="phone" inputmode="numeric" placeholder="09XX XXX XXXX" autocomplete="off"><button type="button" class="x" id="phone-x" aria-label="清空">×</button></div>
+        <div class="err" id="phone-err"></div>
+      </div>
+      <button class="btn" id="send">Send code</button>
+      <button class="btn ghost" id="later">Later</button>
+    </section>
+    <div class="ov" id="ov" hidden><div class="dlg"><h3 id="ov-t"></h3><p class="hint" id="ov-p" style="margin:0"></p><button class="btn" id="ov-ok">OK</button></div></div>
+    <div class="toast" id="toast" hidden></div>
+  </div></div>
+
+  <aside class="notes" aria-label="规则批注">
+    <h2>规则批注</h2>
+    <p class="sub">对应 PRD 功能点 F06。<a href="../../docs/prd.html#pg-F06">查看 PRD</a></p>
+    <ol>
+      <li><span class="fp">F06-01</span>Google、Facebook、Telegram（iOS 另有 Apple）首次登录后引导绑定手机号，可点 Later 稍后再绑。<span class="ref">PD/1154492 -6093</span></li>
+      <li><span class="fp">F06-01</span>绑定复用手机号规则、人机验证和短信验证码；已禁止换绑。<span class="ref">-5457 -1827</span></li>
+      <li><span class="fp">F06-02</span>未绑定时不能提款、不能设置登录密码，新用户转盘第 2 次抽奖前必须绑定（在登录成功页演示）。<span class="ref">PD/1154492 -5754</span></li>
+      <li><span class="fp">F06-03</span>号码已属于其他账号时怎么处理待 Q5 确认，原型先演示「拒绝并提示」，文案为示意。</li>
+      <li><span class="fp">F06-03</span>冻结或自我排除用户用三方登录时提示账号受限（Viber PRD），其他渠道资料未覆盖。<span class="ref">PD/49578232</span></li>
+      <li><span class="fp">F06-03</span><span class="warn-1">※ Facebook 登录密钥硬编码、JWT 未校验 audience（-6709）须在上线前修复。</span></li>
+    </ol>
+    <h3>模拟操作</h3>
+    <div class="sim">
+      <label>三方渠道 <select id="sim-sso"><option>Google</option><option>Facebook</option><option>Telegram</option><option>Apple</option></select></label>
+      <button type="button" id="sim-used"><span class="simtag">模拟</span>号码已被其他账号绑定</button>
+      <button type="button" id="sim-restrict"><span class="simtag">模拟</span>自我排除账号用三方登录</button>
+    </div>
+    <div class="pager"><a href="set-password.html">← 上一页：新用户设置密码</a><a href="forgot-password.html">下一页：找回密码 →</a></div>
+  </aside>
+</div>
+</div>
+<script>window.NAV_ROOT = "../../";</script>
+<script src="../../assets/nav-data.js"></script>
+<script src="../../assets/nav.js"></script>
+<script src="../../assets/proto.js"></script>
+<script>
+var $ = function (id) { return document.getElementById(id); };
+var used = false;
+var sso = P.get("sso") || "Google";
+function dialog(t, p, after) {
+  $("ov-t").textContent = t; $("ov-p").textContent = p; $("ov").hidden = false;
+  $("ov-ok").onclick = function () { $("ov").hidden = true; if (after) after(); };
+}
+$("who").textContent = "Logged in with " + sso;
+P.bindPhone($("phone"), $("phone-box"), $("phone-err"), $("phone-x"));
+$("send").onclick = function () {
+  if (!P.check($("phone"), $("phone-box"), $("phone-err"))) return;
+  if (used) { $("phone-err").textContent = "This mobile number is already linked to another account."; $("phone-box").classList.add("bad"); return; }
+  P.set("phone", $("phone").value.trim()); P.set("otpPurpose", "bind"); P.set("captchaMode", "otp");
+  P.go("captcha.html");
+};
+$("later").onclick = function () { P.go("home.html"); };
+$("sim-sso").value = sso;
+$("sim-sso").onchange = function () { sso = this.value; P.set("sso", sso); P.set("phoneBound", false); $("who").textContent = "Logged in with " + sso; };
+$("sim-used").onclick = function () { used = true; P.toast("已设为：号码已被占用（模拟），再点 Send code 查看"); };
+$("sim-restrict").onclick = function () { dialog("Account restricted", "Your account is currently restricted. Please contact customer service.", function () { P.go("login.html"); }); };
+</script>
+</body>
+</html>

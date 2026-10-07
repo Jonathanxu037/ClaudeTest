@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>登录成功 · 注册登录原型</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="with-nav">
+<div class="proto">
+  <div class="proto-head">
+    <p class="muted" style="margin:0">原型页面 › 前台页面</p>
+    <h1>登录成功</h1>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="sb"><span>9:41</span><span>5G ▮▮▮</span></div>
+    <section class="view">
+      <div class="row"><b style="font-size:18px">789<span style="color:var(--app-gold)">.</span></b><span class="hint" id="nick">Hi, Player12345 0001</span></div>
+      <div class="card-app"><span class="hint">Balance</span><div class="bal">₱ 0.00</div>
+        <div class="row"><button class="btn" style="flex:1" id="deposit">Deposit</button><button class="btn ghost" style="flex:1" id="withdraw">Withdraw</button></div>
+      </div>
+      <div class="card-app"><b>Inbox · 2 new</b><span class="hint">Registration Info<br>KYC Verification Reminder</span></div>
+      <div class="card-app"><b>Account Security</b><button class="link" type="button" id="setpwd" style="text-align:left">Set login password</button></div>
+      <button class="btn ghost" id="logout">Log out</button>
+      <div class="tabbar"><span><b>⌂</b>Home</span><span><b>◎</b>Games</span><span><b>₱</b>Wallet</span><span><b>☺</b>Account</span></div>
+    </section>
+    <div class="ov" id="bio" hidden><div class="dlg">
+      <h3>Enable Biometric Login</h3>
+      <p class="hint" style="margin:0">Use fingerprint or Face ID to log in next time.</p>
+      <button class="btn" id="bio-ok">Enable</button>
+      <button class="btn ghost" id="bio-no">Not now</button>
+    </div></div>
+    <div class="ov" id="ov" hidden><div class="dlg"><h3 id="ov-t"></h3><p class="hint" id="ov-p" style="margin:0"></p><button class="btn" id="ov-ok">OK</button></div></div>
+    <div class="toast" id="toast" hidden></div>
+  </div></div>
+
+  <aside class="notes" aria-label="规则批注">
+    <h2>规则批注</h2>
+    <p class="sub">对应 PRD 功能点 F08，以及 F02-07、F06-02 的拦截演示。<a href="../../docs/prd.html#pg-F08">查看 PRD</a></p>
+    <ol>
+      <li><span class="fp">F08-01</span>iOS / Flutter 首次登录后弹 "Enable Biometric Login"；扫脸或指纹、失败次数上限在后台「App 登录设置」配置。点 Not now 后多久再弹待 Q6。<span class="ref">-6250 -4437</span></li>
+      <li><span class="fp">F08-02</span>同一时间只允许一台设备在线；另一设备登录后，本设备提示 code 1005 并退出（英文为示意）。被顶号后要完整登录，不能用生物识别。<span class="ref">-3070 PD/49578232</span></li>
+      <li><span class="fp">F08-03</span>注册后系统发送 "Registration Info" 和 "KYC Verification Reminder" 站内信；默认昵称为 Player + 5 位随机数 + 手机号后 4 位。<span class="ref">平台知识库 4.3</span></li>
+      <li><span class="fp">F06-02</span>三方账号未绑手机号时，点 Withdraw 或设置登录密码先引导绑定。<span class="ref">PD/1154492</span></li>
+      <li><span class="fp">F02-07</span>冻结账号可以登录、只能查看，操作时弹出后台填写的告知原因（≤ 50 字符）。<span class="ref">-3212 PD/1157182</span></li>
+    </ol>
+    <h3>模拟操作</h3>
+    <div class="sim">
+      <label>端 <select id="sim-plat"><option>H5</option><option>iOS</option><option>Flutter</option></select></label>
+      <button type="button" id="sim-kick"><span class="simtag">模拟</span>另一台设备登录同一账号</button>
+      <button type="button" id="sim-bio"><span class="simtag">模拟</span>重新弹出生物识别引导</button>
+    </div>
+    <div class="pager"><a href="forgot-password.html">← 上一页：找回密码</a><span></span></div>
+  </aside>
+</div>
+</div>
+<script>window.NAV_ROOT = "../../";</script>
+<script src="../../assets/nav-data.js"></script>
+<script src="../../assets/nav.js"></script>
+<script src="../../assets/proto.js"></script>
+<script>
+var $ = function (id) { return document.getElementById(id); };
+var plat = P.get("platform");
+function dialog(t, p, after) {
+  $("ov-t").textContent = t; $("ov-p").textContent = p; $("ov").hidden = false;
+  $("ov-ok").onclick = function () { $("ov").hidden = true; if (after) after(); };
+}
+var ph = P.get("phone");
+$("nick").textContent = "Hi, Player48213" + (ph && ph.length === 11 ? ph.slice(-4) : "0001");
+function frozen() {
+  if (P.get("status") !== "frozen") return false;
+  dialog("Account frozen", "Reason: 告知用户原因（后台填写，≤ 50 字符）", null); return true;
+}
+function needPhone() {
+  if (!P.get("sso") || P.get("phoneBound")) return false;
+  P.toast("Please link your mobile number first"); P.go("bind-phone.html", 900); return true;
+}
+$("withdraw").onclick = function () { if (frozen() || needPhone()) return; P.toast("进入提现页（不在本需求范围）"); };
+$("deposit").onclick = function () { if (frozen()) return; P.toast("进入充值页（不在本需求范围）"); };
+$("setpwd").onclick = function () { if (frozen() || needPhone()) return; P.set("pwdMode", "reset"); P.go("set-password.html"); };
+$("logout").onclick = function () { P.go("login.html"); };
+function maybeBio() {
+  if ((plat === "iOS" || plat === "Flutter") && !P.get("bioAsked")) setTimeout(function () { $("bio").hidden = false; }, 500);
+}
+$("bio-ok").onclick = function () { $("bio").hidden = true; P.set("bioAsked", true); P.toast("Biometric login enabled"); };
+$("bio-no").onclick = function () { $("bio").hidden = true; P.set("bioAsked", true); };
+$("sim-plat").value = plat;
+$("sim-plat").onchange = function () { plat = this.value; P.set("platform", plat); maybeBio(); };
+$("sim-kick").onclick = function () {
+  dialog("Logged in on another device", "Your account was logged in on another device (code 1005). Please log in again.", function () { P.set("bioAsked", true); P.go("login.html"); });
+};
+$("sim-bio").onclick = function () { P.set("bioAsked", false); maybeBio(); };
+maybeBio();
+</script>
+</body>
+</html>

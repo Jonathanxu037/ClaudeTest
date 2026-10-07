@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>注册登录 PRD</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="with-nav">
+<div id="fp-banner" class="fp-banner" hidden><span id="fp-text"></span><button type="button" id="fp-clear">清除标注</button></div>
+<main class="doc" id="doc">
+
+<header class="doc-head">
+  <h1>789 注册登录流程 PRD</h1>
+  <div class="meta">
+    <span class="status">确认中</span>
+    <span>版本 v2.2</span>
+    <span>日期 2026-10-07</span>
+    <span>时区 GMT+8</span>
+  </div>
+  <p class="muted" style="margin:0" id="doc-proto"><span class="vmark" data-v="v2.2">配套原型：本需求包「原型页面 › 前台页面」下的 8 个页面，与第三章 F01–F08 一一对应（对照表见附录 B）。<sup class="vtag" data-v="v2.2">v2.2</sup></span></p>
+</header>
+
+<blockquote>
+<b>依据</b>：《789平台现状知识库》第 1 章与「四、通用需求评审清单」（v2.2）、《789Bingo平台知识库》第 4 章、《789Bingo管理后台知识库》4.13，以及其中引用的工单。单号未写前缀的均为 BB2025789。
+</blockquote>
+
+<h2 id="ver">需求版本管理表</h2>
+<div class="tbl vmark" data-v="v2.2" style="padding:0">
+<table id="vtable">
+<tr><th>版本号</th><th>时间</th><th>修改人</th><th>概述</th><th>涉及章节</th></tr>
+<tr data-v="v2.2" data-sum="测试打包样式"><td>v2.2</td><td>2026-10-07</td><td>Joshua</td><td>测试打包样式</td><td>
+  <button class="linkbtn" type="button" data-chg="c22"></button>
+  <ul class="chg" id="c22" hidden>
+    <li><a href="#ver"><b>修改</b>：需求版本管理表 › 改为版本号 / 时间 / 修改人 / 概述 / 涉及章节五列</a></li>
+    <li><a href="#toc"><b>新增</b>：全文目录（按正文标题自动生成）</a></li>
+    <li><a href="#doc-proto"><b>修改</b>：文首 › 配套原型改为需求包内的 8 个页面</a></li>
+    <li><a href="#s3-1"><b>修改</b>：3.1 业务流程 › 改为步骤卡片和分支卡片</a></li>
+    <li><a href="#fp-list"><b>新增</b>：3.2 功能点清单（F01–F08，共 27 个子功能点）</a></li>
+    <li><a href="#s3-2"><b>修改</b>：3.2 页面规则 › 各条规则标注功能点编号</a></li>
+    <li><a href="#apx-b"><b>修改</b>：附录 B › 改为原型页面对照表</a></li>
+  </ul>
+</td></tr>
+<tr data-v="v2.1" data-sum="按《生成内容规范》v2.2 改为单文件 HTML，与原型一起放入 Product Materials"><td>v2.1</td><td>2026-10-07</td><td>Joshua</td><td>按《生成内容规范》v2.2 改为单文件 HTML，与原型一起放入 Product Materials</td><td>
+  <button class="linkbtn" type="button" data-chg="c21"></button>
+  <ul class="chg" id="c21" hidden>
+    <li><a href="#ver"><b>修改</b>：全文 › 输出格式由 Markdown 改为 HTML，正文内容不变</a></li>
+  </ul>
+</td></tr>
+<tr data-v="v2.0" data-sum="按《生成内容规范》v2.0 重排章节结构"><td>v2.0</td><td>2026-10-07</td><td>Joshua</td><td>按《生成内容规范》v2.0 重排章节结构</td><td>
+  <button class="linkbtn" type="button" data-chg="c20"></button>
+  <ul class="chg" id="c20" hidden>
+    <li><a href="#s3-3"><b>新增</b>：3.3 新增规则（N1–N6，与现状分开）</a></li>
+    <li><a href="#s4"><b>新增</b>：四、多端差异</a></li>
+    <li><a href="#s7"><b>修改</b>：七、验收标准（从各页面中拆出单列）</a></li>
+    <li><a href="#q9"><b>新增</b>：十、未决问题 › Q9</a></li>
+    <li><a href="#apx-a"><b>新增</b>：附录 A 评审清单核对</a></li>
+  </ul>
+</td></tr>
+<tr data-v="v1.0" data-sum="创建注册登录 v1.0"><td>v1.0</td><td>2026-10-07</td><td>Joshua</td><td>创建注册登录 v1.0</td><td>全文</td></tr>
+</table>
+<sup class="vtag" data-v="v2.2">v2.2</sup>
+</div>
+
+<h2 id="toc">全文目录</h2>
+<nav class="toc-full vmark" data-v="v2.2" aria-label="全文目录"><ol id="toc-list"></ol><sup class="vtag" data-v="v2.2">v2.2</sup></nav>
+
+<!-- ================= 一 ================= -->
+<h2 id="s1">一、背景与目标</h2>
+<h3 id="s1-1">1. 背景</h3>
+<ul>
+<li><b>工单量大、返工多</b>：账户与合规域的线上故障共 220 条，其中登录/token 46 条、OTP/短信 22 条、注册 17 条（主版第 1 章概况，统计截至 2026-10-07）。</li>
+<li><b>规则分散且多次变更</b>：规则散落在工单、Axure 原型和后台配置里。比如 OTP 重发倒计时从 90s 改到 60s、30s，2026-02 起定为 45s（-1882、-2712、-3476）。</li>
+<li><b>多端表现不一致</b>：两种登录方式回填的不是同一个账号（-4548）；人机弹窗出来前先报必填（-727、-740、-3536）；Telegram 登录在 iOS 偶发失败（-6420）。</li>
+</ul>
+<h3 id="s1-2">2. 目标</h3>
+<ol>
+<li>把注册、登录、找回密码、三方登录绑定手机号的现行规则整理成一份文档，作为各端开发和测试的统一依据。</li>
+<li>列出资料之间的冲突和没有定值的地方，由产品确认后补齐。</li>
+<li>配套可点击原型和功能自查清单，每个功能点对应规则、边界异常和验收标准。</li>
+</ol>
+
+<!-- ================= 二 ================= -->
+<h2 id="s2">二、范围</h2>
+<h3 id="s2-1">1. 做</h3>
+<div class="tbl"><table>
+<tr><th>端</th><th>范围</th><th>说明</th></tr>
+<tr><td>H5 / PWA</td><td>做</td><td>主要入口；H5 限制海外 IP（-4492）</td></tr>
+<tr><td>PC</td><td>做</td><td>与 H5 同规则</td></tr>
+<tr><td>iOS 原生</td><td>做</td><td>含生物识别登录；Apple 登录去留见 Q3</td></tr>
+<tr><td>Flutter</td><td>做</td><td>含生物识别登录</td></tr>
+<tr><td>后台</td><td>只用现有配置</td><td>本期不新增后台功能，配置位置见第五章；因此本需求包不含后台原型和后台操作手册</td></tr>
+</table></div>
+<h3 id="s2-2">2. 不做</h3>
+<ul>
+<li><b>安卓原生老包</b>：靠服务端强更拦截，登录和注册时返回 2615（backend/1158698）。</li>
+<li><b>KYC 流程</b>（证件、人脸、补充信息）、NDRP 校验、3 天未 KYC 临时冻结：见主版第 1 章 R6–R10，本文只写和登录注册的衔接点。</li>
+<li><b>Viber 登录</b>（-6517，评审通过，子任务待开发）。</li>
+<li><b>活动规则</b>：新用户转盘、登录送彩金等。</li>
+<li><b>789games 新站</b>：<span class="warn-3">※ 新站登录流程资料未覆盖，GAM 系列单只涉及注册送 ₱3 移除（GAM-1）和两站 KYC 互通（GAM-2）。</span></li>
+</ul>
+
+<!-- ================= 三 ================= -->
+<h2 id="s3">三、业务规则</h2>
+<h3 id="s3-1">1. 业务流程</h3>
+<div class="vmark" data-v="v2.2" style="padding:6px 8px">主流程从上到下；需要细讲的步骤点「见 3.1.x」跳到下方分支。<sup class="vtag" data-v="v2.2">v2.2</sup></div>
+
+<div class="flow-main">
+  <div class="fstep key" data-fp="F01-01 F01-02 F01-03"><div class="no">1</div><div class="body"><b>进入站点</b>：冷启动 App 或打开 H5 → 弹出 21 岁确认弹窗 → 点 "I agree with all of the above"（F01）。
+    <ul class="cond"><li><b>广告来源 / App 下载页</b>：不弹窗，直接进转盘（是否保留见 Q9）</li></ul></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="no">2</div><div class="body"><b>新用户转盘</b>：按活动配置展示（不在本需求范围）→ 进入登录注册页。</div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep key" data-fp="F02-01 F02-02 F02-03 F02-04 F02-06"><div class="no">3</div><div class="body"><b>选择登录方式</b>：验证码登录/注册、密码登录或三方登录 → 勾选条款（<a href="#b311">见 3.1.1</a>）。
+    <ul class="cond"><li><b>记住上次登录</b>：自动选中上次的方式并回填同一账号</li><li><b>Referral Code</b>：只在邀请链接进入时显示，不可改</li></ul></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep" data-fp="F03-01 F03-02 F04-01 F04-03"><div class="no">4</div><div class="body"><b>完成验证</b>：人机验证 → 短信验证码；或账号密码校验；或三方授权（<a href="#b311">见 3.1.1</a>）。</div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep" data-fp="F05-01 F05-02 F06-01"><div class="no">5</div><div class="body"><b>新用户补全</b>：新手机号 → 自动建号 → 设置密码（可跳过）；三方首次登录 → 绑定手机号（可稍后）（<a href="#b312">见 3.1.2</a>）。</div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep key" data-fp="F08-01 F08-03"><div class="no">6</div><div class="body"><b>登录成功</b>：进入首页 → iOS / Flutter 弹生物识别引导 → 新用户收到注册站内信。</div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep branch" data-fp="F02-07 F08-02"><div class="no">7</div><div class="body"><b>异常收尾（分支）</b>：账号停用、冻结、老版本、H5 海外 IP、另一设备登录（<a href="#b313">见 3.1.3</a>）。</div></div>
+</div>
+
+<h4 id="b311">3.1.1 登录方式分支（按登录方式）</h4>
+<div class="fbranches">
+  <div class="fbr" data-fp="F02-01 F03-01 F04-01 F04-02 F04-03">
+    <h5>A - 验证码登录 / 注册</h5>
+    <p class="st"><b>输入手机号</b><small>09 开头、11 位；格式错误提示 "Please enter a mobile number starting with 09."</small></p><div class="dn">↓</div>
+    <p class="st"><b>点 Send code → 人机验证</b><small>按 captchaType：Cloudflare / 腾讯滑块 / 数字图形码</small></p><div class="dn">↓</div>
+    <p class="st"><b>输入 4 位短信验证码</b><small>"Resend code in 44 S"；输错提示剩余次数</small></p><div class="dn">↓</div>
+    <p class="st"><b>已注册 → 登录成功；未注册 → 自动建号</b><small>新用户进入 3.1.2-A</small></p>
+  </div>
+  <div class="fbr" data-fp="F02-02 F02-05 F03-02 F04-04">
+    <h5>B - 密码登录</h5>
+    <p class="st"><b>输入账号和密码</b><small>账号 hint "Phone/GCash/Maya"，≤ 20 位</small></p><div class="dn">↓</div>
+    <p class="st"><b>点 Log in</b><small>与上次登录间隔不足 30s 时提示 "Please wait at least 30 seconds…"</small></p><div class="dn">↓</div>
+    <p class="st"><b>命中风险规则 → 图片验证</b><small>如同一账号 5 分钟内失败 ≥ 3 次</small></p><div class="dn">↓</div>
+    <p class="st"><b>长时间未登录 → 加一步短信验证</b><small>天数看后台 needOtpLogin</small></p>
+  </div>
+  <div class="fbr" data-fp="F02-06 F06-01">
+    <h5>C - 三方登录</h5>
+    <p class="st"><b>点 Google / Facebook / Telegram</b><small>iOS 另有 Apple；App 端入口待 Q3</small></p><div class="dn">↓</div>
+    <p class="st"><b>跳转三方授权</b><small>三方登录只在主域名开放</small></p><div class="dn">↓</div>
+    <p class="st"><b>首次登录 → 3.1.2-B 绑定手机号</b><small>非首次直接登录成功</small></p>
+  </div>
+</div>
+
+<h4 id="b312">3.1.2 新用户补全分支（按注册方式）</h4>
+<div class="fbranches">
+  <div class="fbr" data-fp="F05-01 F05-02">
+    <h5>A - 手机号新用户</h5>
+    <p class="st"><b>Account created</b><small>自动建号，默认昵称 Player + 5 位随机数 + 手机号后 4 位</small></p><div class="dn">↓</div>
+    <p class="st"><b>设置登录密码</b><small>8–16 位，字母 + 数字；可点 Skip（是否必经见 Q4）</small></p>
+  </div>
+  <div class="fbr" data-fp="F06-01 F06-02 F06-03">
+    <h5>B - 三方新用户</h5>
+    <p class="st"><b>引导绑定手机号</b><small>复用人机验证和短信验证码；可点 Later</small></p><div class="dn">↓</div>
+    <p class="st"><b>未绑定时受限</b><small>不能提款、不能设置登录密码、转盘第 2 次抽奖前必须绑定</small></p>
+  </div>
+  <div class="fbr" data-fp="F02-04">
+    <h5>C - 老用户</h5>
+    <p class="st"><b>直接登录成功</b><small>记住本次登录方式和账号</small></p>
+  </div>
+</div>
+
+<h4 id="b313">3.1.3 异常分支（按账号和环境状态）</h4>
+<div class="fnote">这些分支在任意登录方式下都可能出现，原型在「登录注册页」和「登录成功」页用模拟按钮演示。</div>
+<div class="fbranches">
+  <div class="fbr" data-fp="F02-07">
+    <h5>A - 账号状态</h5>
+    <p class="st"><b>停用（自我排除）</b><small>不能登录，提示文案见 Q7</small></p><div class="dn">↓</div>
+    <p class="st"><b>冻结</b><small>可以登录、只能查看；操作时弹后台填写的告知原因（≤ 50 字符）</small></p>
+  </div>
+  <div class="fbr" data-fp="F02-07">
+    <h5>B - 版本与环境</h5>
+    <p class="st"><b>老版本 App</b><small>返回 2615 引导升级，不计入登录失败次数</small></p><div class="dn">↓</div>
+    <p class="st"><b>H5 海外 IP</b><small>显示拦截页；TG 登录路径已放开</small></p>
+  </div>
+  <div class="fbr" data-fp="F08-02">
+    <h5>C - 会话</h5>
+    <p class="st"><b>另一设备登录</b><small>本设备提示 code 1005 并退出</small></p><div class="dn">↓</div>
+    <p class="st"><b>重新登录</b><small>被顶号后不能用生物识别，要完整登录</small></p>
+  </div>
+</div>
+
+<h3 id="s3-2">2. 功能点与页面规则（现状）</h3>
+<p class="vmark" data-v="v2.2">本节只写现状规则，每条附依据，并标注所属功能点编号（如 <span class="fp">F02-01</span>）。功能点编号固定不变，功能自查清单按编号跳转到这里。<sup class="vtag" data-v="v2.2">v2.2</sup></p>
+
+<h4 id="fp-list">功能点清单</h4>
+<div class="tbl vmark" data-v="v2.2" style="padding:0">
+<table id="fp-table">
+<tr><th>大功能点</th><th>子功能点</th><th>原型页面</th></tr>
+<tr data-fp="F01"><td>F01 21 岁确认弹窗</td><td>F01-01 弹出时机；F01-02 弹窗内容与操作；F01-03 不弹窗的场景</td><td><a href="../prototype/front/age-gate.html">21 岁确认弹窗</a></td></tr>
+<tr data-fp="F02"><td>F02 登录注册页</td><td>F02-01 手机号输入与校验；F02-02 账号密码登录；F02-03 条款与邀请码；F02-04 登录方式记忆；F02-05 登录间隔；F02-06 三方登录入口；F02-07 账号状态与访问拦截</td><td><a href="../prototype/front/login.html">登录注册页</a></td></tr>
+<tr data-fp="F03"><td>F03 人机验证</td><td>F03-01 发送验证码前的人机验证；F03-02 密码登录风险触发验证</td><td><a href="../prototype/front/captcha.html">人机验证</a></td></tr>
+<tr data-fp="F04"><td>F04 短信验证码</td><td>F04-01 发送与重发倒计时；F04-02 短信供应商；F04-03 输入与错误次数；F04-04 长时间未登录需短信验证；F04-05 测试环境验证码</td><td><a href="../prototype/front/otp.html">短信验证码</a></td></tr>
+<tr data-fp="F05"><td>F05 设置密码</td><td>F05-01 密码规则校验；F05-02 跳过与保存</td><td><a href="../prototype/front/set-password.html">新用户设置密码</a></td></tr>
+<tr data-fp="F06"><td>F06 三方登录绑定手机号</td><td>F06-01 绑定引导与流程；F06-02 未绑定手机号的限制；F06-03 号码冲突与受限账号</td><td><a href="../prototype/front/bind-phone.html">三方登录绑定手机号</a></td></tr>
+<tr data-fp="F07"><td>F07 找回密码</td><td>F07-01 入口；F07-02 重置流程与校验</td><td><a href="../prototype/front/forgot-password.html">找回密码</a></td></tr>
+<tr data-fp="F08"><td>F08 登录成功</td><td>F08-01 生物识别引导；F08-02 单设备在线与互踢；F08-03 注册后消息与默认昵称</td><td><a href="../prototype/front/home.html">登录成功</a></td></tr>
+</table>
+<sup class="vtag" data-v="v2.2">v2.2</sup>
+</div>
+
+<h4 id="pg-F01" data-fp="F01">F01 21 岁确认弹窗</h4>
+<p><b>页面说明</b></p>
+<ul>
+<li data-fp="F01-02"><span class="fp">F01-02</span><b>内容</b>：21 岁声明清单、问题赌博求助机构信息（-5364），以及 "Playing in public places is strictly prohibited"。这句已按 PAGCOR 审计意见从登录页移到弹窗和条款里（-6377）。</li>
+<li data-fp="F01-02"><span class="fp">F01-02</span><b>按钮</b>：App 为单按钮 "I agree with all of the above"（-3289）；点 Exit 退出。</li>
+<li data-fp="F01-01"><span class="fp">F01-01</span><b>时机</b>：登录前、登录后都会弹，登录后是否弹由开关控制（-1209、-2606）。登录超过 10 分钟后刷新页面要重新弹出，由开关控制（平台知识库 4.1）。</li>
+</ul>
+<p><b>边界异常</b></p>
+<ul>
+<li data-fp="F01-03"><span class="fp">F01-03</span><b>不弹的场景</b>：Google 广告来源用户不弹，直接进转盘（-4778）；App 下载页是独立 HTML，也不弹（-5339）。<span class="warn-1">※ 这两处会绕过 21 岁确认，属于合规风险（主版风险第 4 条，推测）。本需求不改变现状，需在 Q9 中明确是否保留。</span></li>
+<li data-fp="F01-01"><span class="fp">F01-01</span><b>冷启动</b>：iOS 冷启动不弹窗已修复（-717），回归时要覆盖。</li>
+</ul>
+
+<h4 id="pg-F02" data-fp="F02">F02 登录注册页</h4>
+<p><b>页面说明</b></p>
+<ul>
+<li data-fp="F02-01 F02-02"><span class="fp">F02-01</span><b>页面结构</b>：登录和注册合在一个页面（-753、-711）。两个 Tab：「验证码登录/注册」（默认）和「密码登录」。未注册的手机号通过验证码后自动建号。</li>
+<li data-fp="F02-01"><span class="fp">F02-01</span><b>手机号</b>：必须以 09 开头、共 11 位，占位符 09XX XXX XXXX。获得焦点时自动填入 "0" 并调起数字键盘；用户输入 09 时自动去掉多出的 0。这条规则同样用于忘记密码、换绑手机号和提现绑卡（平台知识库 4.1）。</li>
+<li data-fp="F02-02"><span class="fp">F02-02</span><b>账号</b>：最长 20 位，超长提示 "Content cannot exceed 20 characters"（-3383）；输入框 hint 为 "Phone/GCash/Maya"（平台知识库 4.1）。</li>
+<li data-fp="F02-03"><span class="fp">F02-03</span><b>条款勾选</b>：文案 "I agree to 789's Terms…"，带链接；是否默认勾选由后台开关控制（冲突见 C5）。</li>
+<li data-fp="F02-03"><span class="fp">F02-03</span><b>Referral Code</b>：只在通过邀请好友链接或代理链接进入时显示，自动带入且置灰不可改；其他情况隐藏（平台知识库 4.1）。</li>
+<li data-fp="F02-04"><span class="fp">F02-04</span><b>记住上次登录</b>：自动记住上次使用的登录方式和账号；两种方式切换时保留手机号，回填同一个账号（-4548）。</li>
+<li data-fp="F02-05"><span class="fp">F02-05</span><b>登录间隔</b>：两次登录至少间隔 30s，提示 "Please wait at least 30 seconds…"（-5069）。<span class="warn-2">※ 前后端都要拦截，不能只做前端。</span></li>
+<li data-fp="F02-06"><span class="fp">F02-06</span><b>三方登录入口</b>：Google、Facebook、Telegram；iOS 另有 Apple（-4956、-6093）。三方登录只在主域名开放。App 端入口范围见 Q3。</li>
+<li data-fp="F02-01"><span class="fp">F02-01</span><b>顶部 Banner</b>：在后台「活动图素材管理 › 注册登录页」配置，排序值不可重复（平台知识库 4.1）。</li>
+<li data-fp="F02-03"><span class="fp">F02-03</span><b>底部文案</b>：PAGCOR 标识和 21+ 提示。「删除登录注册页底部文案」一单已挂起（-5263），本期保留。</li>
+</ul>
+<p><b>边界异常</b></p>
+<div class="tbl"><table>
+<tr><th>场景</th><th>表现</th><th>依据</th></tr>
+<tr data-fp="F02-01 F03-01"><td><span class="fp">F02-01</span>手机号为空就点 Send code</td><td>提示 "This field is required"；人机弹窗出现之前不能先报验证码必填</td><td>-727、-3536</td></tr>
+<tr data-fp="F02-01"><td><span class="fp">F02-01</span>手机号不以 09 开头</td><td>提示格式错误，文案见 C4</td><td>-1980、平台知识库 4.1</td></tr>
+<tr data-fp="F02-01 F02-02"><td><span class="fp">F02-01</span>点输入框 "x" 清空</td><td>立即显示 "This field is required"，不残留旧提示</td><td>-3383</td></tr>
+<tr data-fp="F02-05"><td><span class="fp">F02-05</span>30s 内再次登录</td><td>提示等待，不发请求</td><td>-5069</td></tr>
+<tr data-fp="F02-02"><td><span class="fp">F02-02</span>账号或密码错误</td><td>提示「账号或密码错误，请确认后重试」，并显示剩余次数；英文文案资料未覆盖</td><td>平台知识库 4.1</td></tr>
+<tr data-fp="F02-07"><td><span class="fp">F02-07</span>强更守卫返回 2615</td><td>引导升级；不计入登录失败次数</td><td>backend/1158698</td></tr>
+<tr data-fp="F02-07"><td><span class="fp">F02-07</span>账号停用（自我排除）</td><td>不能登录；提示文案资料未覆盖（Q7）</td><td>平台知识库 用户状态表</td></tr>
+<tr data-fp="F02-07"><td><span class="fp">F02-07</span>账号冻结</td><td>可以登录，只能查看；操作时弹出后台填写的告知原因（≤50 字符）</td><td>-3212、PD/1157182</td></tr>
+<tr data-fp="F02-07"><td><span class="fp">F02-07</span>H5 海外 IP</td><td>显示拦截页；TG 登录路径已放开</td><td>-4492、-6150、-6305</td></tr>
+</table></div>
+
+<h4 id="pg-F03" data-fp="F03">F03 人机验证</h4>
+<p><b>页面说明</b></p>
+<ul>
+<li data-fp="F03-01"><span class="fp">F03-01</span><b>验证码登录</b>：点 Send code 后、发短信前触发；H5 绑定手机号也要过人机（-5457）。</li>
+<li data-fp="F03-01"><span class="fp">F03-01</span><b>验证类型</b>：由后台 <code>captchaType</code> 决定，1 = Cloudflare Turnstile，2 = 腾讯滑块，0 或其他 = 数字图形码（-816）。2026-01 起手机号登录前先过 Cloudflare "Verifying..."（-1980、-4091）。</li>
+<li data-fp="F03-02"><span class="fp">F03-02</span><b>密码登录</b>：命中风险规则时触发图片验证，由后台「图片验证规则触发」开关控制，触发原因要落库。命中任一即触发（平台知识库 4.1）：
+  <ul>
+  <li>同一账号或同一 IP 5 分钟内登录失败 ≥ 3 次；</li>
+  <li>近期改过登录密码或提款密码后的首次登录；</li>
+  <li>新设备或设备指纹变化；模拟器、Root 设备；</li>
+  <li>同一设备 1 分钟内登录 ≥ 3 个账号；同一 IP 5 分钟内登录超过 3 个账号；</li>
+  <li>请求频率异常（0.1 秒内连续请求，或 send 接口 5 秒内 ≥ 3 次）；非正常 UA；异地 IP。</li>
+  </ul></li>
+</ul>
+<p><b>边界异常</b></p>
+<ul>
+<li data-fp="F03-01"><span class="fp">F03-01</span><b>图形码位数不足</b>：提示 "Please enter 4-digit verification code"（-2383）。</li>
+<li data-fp="F03-01"><span class="fp">F03-01</span><b>Cloudflare 不可用</b>：「CF 异常时自动切换」和「恢复腾讯滑块」两个需求均被否决（-3866、-4044），只能由运营手动改 <code>captchaType</code>。</li>
+<li data-fp="F03-02"><span class="fp">F03-02</span><b>设备指纹误判</b>：同一浏览器会产生多个设备指纹，是已知缺陷（-5963 评论），可能让「设备指纹变化」规则误触发。</li>
+</ul>
+
+<h4 id="pg-F04" data-fp="F04">F04 短信验证码</h4>
+<p><b>页面说明</b></p>
+<ul>
+<li data-fp="F04-01"><span class="fp">F04-01</span><b>格式</b>：4 位数字，支持从剪贴板粘贴；发送成功提示 "Verification code sent successfully"（平台知识库 4.1）。</li>
+<li data-fp="F04-01"><span class="fp">F04-01</span><b>重发倒计时</b>：45s，文案 "Resend code in 44 S"；关闭页面再进入时接着原倒计时走，不重置（-2712、-1882、-3476）。<span class="warn-2">※ 以 45s 为准，平台知识库的 60s 已过时，见 C1。</span></li>
+<li data-fp="F04-02"><span class="fp">F04-02</span><b>供应商</b>：首发走用户所属运营商；60s 内再次请求时轮换 Smart / Globe（-2712）。M360 返回 opted-out 时切到 Smart（-5152）；号码处于 OPTED_OUT 时给友好提示（-6230）。</li>
+<li data-fp="F04-03"><span class="fp">F04-03</span><b>错误次数</b>：输错时提示 "Invalid verification code, you still have N times left"（-2264）。上限和锁定时长见 C2 和 Q1。</li>
+<li data-fp="F04-04"><span class="fp">F04-04</span><b>长时间未登录</b>：超过后台「长时间未登录天数 OTP 设置」（<code>needOtpLogin</code>）的账号，密码登录时也要走短信验证；天数以后台配置为准（后台知识库 4.13.3）。</li>
+<li data-fp="F04-05"><span class="fp">F04-05</span><b>测试环境</b>：UAT/QAT 验证码固定 0000，不真实发送（-6732，评审通过）。</li>
+</ul>
+<p><b>边界异常</b></p>
+<div class="tbl"><table>
+<tr><th>场景</th><th>表现</th><th>依据</th></tr>
+<tr data-fp="F04-03"><td><span class="fp">F04-03</span>10 天未登录账号输入正确 OTP</td><td>不能出现「第一次点击无反应、再点报错」</td><td>-2264</td></tr>
+<tr data-fp="F04-03"><td><span class="fp">F04-03</span>验证码校验下标越界</td><td>故障验证中</td><td>-6681</td></tr>
+<tr data-fp="F04-02"><td><span class="fp">F04-02</span>每个 IP、每个手机号每天发送超限</td><td>提示超限，数值以后台配置为准</td><td>平台知识库 4.2</td></tr>
+<tr data-fp="F04-01 F07-02"><td><span class="fp">F04-01</span>切换账号后进入找回密码</td><td>不残留上一个账号的频控提示</td><td>-885</td></tr>
+<tr data-fp="F04-03"><td><span class="fp">F04-03</span>验证码输错</td><td>不能弹出冻结弹窗</td><td>-5706</td></tr>
+</table></div>
+
+<h4 id="pg-F05" data-fp="F05">F05 设置密码</h4>
+<p><b>页面说明</b></p>
+<ul>
+<li data-fp="F05-02"><span class="fp">F05-02</span><b>时机</b>：验证码注册成功后引导设置登录密码，可跳过（是否改为必经步骤见 Q4）。</li>
+<li data-fp="F05-01"><span class="fp">F05-01</span><b>密码规则</b>：8–16 位，必须同时含字母和数字，不允许中文、空格和表情；超出位数不能继续输入；两次输入要一致（-5545、平台知识库 4.1）。</li>
+<li data-fp="F05-01"><span class="fp">F05-01</span><b>服务端校验</b>：服务端同样强制 8–16 位，不合规返回 code 15242（-5421）。</li>
+<li data-fp="F05-01"><span class="fp">F05-01</span><b>老用户</b>：6–16 位的旧密码仍可登录，不强制修改（-853）。</li>
+</ul>
+<p><b>边界异常</b></p>
+<ul>
+<li data-fp="F05-01"><span class="fp">F05-01</span><b>绕过前端提交</b>：直接调接口提交 7 位或 17 位密码，服务端拒绝（-5421）。</li>
+<li data-fp="F05-01"><span class="fp">F05-01</span><b>锁定</b>：改密时旧密码校验失败若干次后锁定 60 分钟（code 1168，-5422）。登录失败的锁定阈值资料里没有定值（主版 R4），见 Q2。</li>
+</ul>
+
+<h4 id="pg-F06" data-fp="F06">F06 三方登录绑定手机号</h4>
+<p><b>页面说明</b></p>
+<ul>
+<li data-fp="F06-01"><span class="fp">F06-01</span><b>渠道</b>：Google、Facebook 一键建号（PD/1154492）；Telegram 已上线，后台可解绑（-6093）。Facebook 绑定时写入会员日志（平台知识库 4.1）。</li>
+<li data-fp="F06-01"><span class="fp">F06-01</span><b>引导</b>：首次登录后引导绑定手机号，可以稍后再绑。</li>
+<li data-fp="F06-02"><span class="fp">F06-02</span><b>未绑定手机号的限制</b>（PD/1154492、-5754）：
+  <ul>
+  <li>不能提款；</li>
+  <li>不能设置登录密码，点设置时先弹出绑定手机号窗口；</li>
+  <li>新用户转盘第 2 次抽奖前必须绑定。</li>
+  </ul></li>
+<li data-fp="F06-01"><span class="fp">F06-01</span><b>流程复用</b>：绑定流程复用 F02-01 的手机号规则、F03 人机验证和 F04 短信验证码。</li>
+<li data-fp="F06-01"><span class="fp">F06-01</span><b>换绑</b>：已禁止换绑（-1827）。</li>
+</ul>
+<p><b>边界异常</b></p>
+<ul>
+<li data-fp="F06-03"><span class="fp">F06-03</span><b>手机号已属于其他账号</b>：自动合并还是拒绝绑定，资料未覆盖，见 Q5。</li>
+<li data-fp="F06-03"><span class="fp">F06-03</span><b>冻结或自我排除用户</b>：Viber PRD 写明登录时提示账号受限（PD/49578232）；其他三方渠道是否同样处理，资料未覆盖。</li>
+<li data-fp="F06-01"><span class="fp">F06-01</span><b>Telegram</b>：iOS 偶发登录失败（-6420）；TG 内置浏览器里异地登录提示曾连弹 3–4 次（-1993，已修）。</li>
+</ul>
+
+<h4 id="pg-F07" data-fp="F07">F07 找回密码</h4>
+<p><b>页面说明</b></p>
+<ul>
+<li data-fp="F07-01"><span class="fp">F07-01</span><b>入口</b>："Retrieve password via phone number"，以及 "Register/login with verification code"。后者直接进入验证码登录，与 H5 一致（-3479）。</li>
+<li data-fp="F07-01"><span class="fp">F07-01</span><b>已登录入口</b>：从 Account Security 进入时，手机号自动带出且不可改（-5545）。</li>
+<li data-fp="F07-02"><span class="fp">F07-02</span><b>重置方式</b>：只保留手机号重置，旧版密保问题重置已去掉（平台知识库 4.3）。</li>
+<li data-fp="F07-02 F05-01"><span class="fp">F07-02</span><b>新密码规则</b>：同 F05-01。</li>
+</ul>
+<p><b>边界异常</b></p>
+<ul>
+<li data-fp="F07-02"><span class="fp">F07-02</span><b>号码不一致</b>：手机号与账号不一致时，后端提示 "Mismatch phone no."（-5442）。</li>
+</ul>
+
+<h4 id="pg-F08" data-fp="F08">F08 登录成功</h4>
+<p><b>页面说明</b></p>
+<ul>
+<li data-fp="F08-01"><span class="fp">F08-01</span><b>生物识别</b>：App 登录后弹出 "Enable Biometric Login" 引导（-6250）。生物识别登录 2026-07 上线（-4437）；方式（扫脸 / 指纹）、失败次数上限、开关在后台「App 登录设置」按 iOS / 安卓分别配置。生物识别重建会话的冷却默认 10s（以上见 -4437、-4889、-5389、-5944）。</li>
+<li data-fp="F08-02"><span class="fp">F08-02</span><b>单设备在线</b>：异地登录互踢，被踢端提示 code 1005（-3070）；App 同一时间只允许一台设备在线（PD/49578232）。被他人顶号或会话失效后，要重新完整登录。</li>
+<li data-fp="F08-03"><span class="fp">F08-03</span><b>注册后消息</b>：系统自动发送 "Registration Info" 和 "KYC Verification Reminder" 站内信（后台知识库 消息列表）。</li>
+<li data-fp="F08-03"><span class="fp">F08-03</span><b>默认昵称</b>：Player + 5 位随机数 + 手机号后 4 位（平台知识库 4.3）。</li>
+</ul>
+<p><b>边界异常</b></p>
+<ul>
+<li data-fp="F08-02"><span class="fp">F08-02</span><b>误登出</b>：误弹异地登录（-3070、-3605、-5589）；进聊天室时 refresh 失败导致登出（-6317）。2026-10 Redis 内存满、频繁驱逐 key（-6708），会放大误登出。</li>
+<li data-fp="F08-01"><span class="fp">F08-01</span><b>引导缺失</b>：已录入人脸却不弹引导、个人中心没有开关（-4828）。</li>
+</ul>
+
+<h3 id="s3-3">3. 新增规则</h3>
+<div class="vmark old" data-v="v2.0" style="padding:0">
+<p style="margin:.3rem 6px">以下是本需求新提出的规则，现状里没有，需评审通过后执行。<sup class="vtag" data-v="v2.0">v2.0</sup></p>
+<div class="tbl" style="margin:0"><table>
+<tr><th>编号</th><th>规则</th><th>功能点</th><th>起因</th></tr>
+<tr data-fp="F05-01"><td>N1</td><td>设置密码时，实时显示「8–16 位」「同时含字母和数字」「不含空格和表情」三条规则的满足状态</td><td>F05-01</td><td>减少提交后才报错</td></tr>
+<tr data-fp="F05-01"><td>N2</td><td>两次密码不一致时提示 "Passwords do not match"，Save 不可点</td><td>F05-01</td><td>现状文案资料未覆盖</td></tr>
+<tr data-fp="F02-03"><td>N3</td><td>未勾选条款时，不能发送验证码，也不能发起三方登录，Toast 提示勾选</td><td>F02-03</td><td>现状只写了条款勾选，未写拦截行为</td></tr>
+<tr data-fp="F02-01 F06-01 F07-02"><td>N4</td><td>手机号格式错误文案统一为 "Please enter a mobile number starting with 09."</td><td>F02-01</td><td>各端文案不一致，见 C4</td></tr>
+<tr data-fp="F07-02"><td>N5</td><td>未绑定手机号的三方账号进入找回密码时，引导改用验证码登录或三方登录</td><td>F07-02</td><td>现状资料未覆盖</td></tr>
+<tr data-fp="F02-06"><td>N6</td><td>各端补齐 <code>login_method_click</code> 埋点</td><td>F02-06</td><td>现有埋点缺报，见第六章</td></tr>
+</table></div>
+</div>
+
+<h3 id="s3-4">4. 通用规则汇总（现状）</h3>
+<div class="tbl"><table>
+<tr><th>编号</th><th>规则</th><th>数值</th><th>依据</th></tr>
+<tr data-fp="F02-01"><td>G1</td><td>手机号格式</td><td>09 开头、11 位</td><td>-1980、平台知识库 4.1</td></tr>
+<tr data-fp="F04-01"><td>G2</td><td>短信验证码</td><td>4 位数字</td><td>平台知识库 4.1</td></tr>
+<tr data-fp="F04-01"><td>G3</td><td>重发倒计时</td><td>45s</td><td>-2712、-3476</td></tr>
+<tr data-fp="F02-05"><td>G4</td><td>登录间隔</td><td>30s</td><td>-5069</td></tr>
+<tr data-fp="F05-01"><td>G5</td><td>登录密码</td><td>8–16 位，字母 + 数字</td><td>-5545、-5421</td></tr>
+<tr data-fp="F05-01"><td>G6</td><td>改密 / 密保二次校验失败锁定</td><td>60 分钟（code 1168）</td><td>-5422</td></tr>
+<tr data-fp="F02-02"><td>G7</td><td>账号长度</td><td>≤ 20 位</td><td>-3383</td></tr>
+<tr data-fp="F03-02"><td>G8</td><td>注册风控</td><td>同 IP 同设备每天 1 个；同 IP 不同设备每天 10 个（线上配置）</td><td>-2416</td></tr>
+<tr data-fp="F04-01"><td>G9</td><td>手机号展示</td><td>前 3 后 4</td><td>主版第 1 章检查清单第 10 项</td></tr>
+<tr data-fp="F04-05"><td>G10</td><td>测试环境验证码</td><td>固定 0000</td><td>-6732</td></tr>
+</table></div>
+
+<!-- ================= 四 ================= -->
+<h2 id="s4">四、多端差异</h2>
+<div class="tbl vmark old" data-v="v2.0" style="padding:0"><table>
+<tr><th>项目</th><th>H5 / PWA</th><th>PC</th><th>iOS 原生</th><th>Flutter</th><th>依据</th></tr>
+<tr data-fp="F02-06"><td>三方登录入口</td><td>Google、FB、TG</td><td>Google、FB、TG</td><td>另有 Apple；Google 和 Apple 是否隐藏见 Q3</td><td>Google 是否隐藏见 Q3</td><td>-4956、平台知识库 4.1</td></tr>
+<tr data-fp="F08-01"><td>生物识别登录</td><td>不支持</td><td>不支持</td><td>支持</td><td>支持</td><td>-4437</td></tr>
+<tr data-fp="F02-07"><td>海外 IP 限制</td><td>限制</td><td>限制</td><td>不限制</td><td>不限制</td><td>-4492</td></tr>
+<tr data-fp="F02-07"><td>强更守卫 2615</td><td>不适用</td><td>不适用</td><td>适用</td><td>适用</td><td>backend/1158698</td></tr>
+<tr data-fp="F03-01"><td>人机验证形态</td><td>按 <code>captchaType</code></td><td>按 <code>captchaType</code></td><td>按 <code>captchaType</code>；2025-11 曾为腾讯滑块</td><td>按 <code>captchaType</code>；早期安卓为数字码</td><td>-816、-727、-840</td></tr>
+<tr data-fp="F01-02"><td>21 岁弹窗</td><td>逐项勾选（2025-12 版）</td><td>同 H5</td><td>单按钮（2026-03 起）</td><td>单按钮</td><td>-1137、-3289</td></tr>
+</table><sup class="vtag" data-v="v2.0">v2.0</sup></div>
+<p><span class="warn-3">※ H5 的 21 岁弹窗是否已改成单按钮，资料未覆盖；上表 H5 一栏为 2025-12 的录屏形态。</span></p>
+
+<!-- ================= 五 ================= -->
+<h2 id="s5">五、后台配置</h2>
+<p>本期不新增配置，以下为现有配置位置（后台知识库 4.13）。新增开关时默认关闭。</p>
+<div class="tbl"><table>
+<tr><th>配置项</th><th>位置</th><th>功能点</th></tr>
+<tr data-fp="F02-01 F02-03"><td>注册字段（手机号、短信验证码、邀请码、KYC 验证等）</td><td>系统参数 › 注册登陆 › 注册参数</td><td>F02</td></tr>
+<tr data-fp="F03-01"><td>前台验证码类型 <code>captchaType</code></td><td>系统参数 › 注册登陆 › 验证码</td><td>F03-01</td></tr>
+<tr data-fp="F03-02"><td>图片验证规则触发</td><td>同上</td><td>F03-02</td></tr>
+<tr data-fp="F06-03"><td>是否验证重复手机号 <code>validateDuplicatePhone</code></td><td>同上</td><td>F06-03</td></tr>
+<tr data-fp="F04-04"><td>长时间未登录天数 OTP 设置 <code>needOtpLogin</code></td><td>同上</td><td>F04-04</td></tr>
+<tr data-fp="F03-02"><td>同名注册 <code>regUqFullName</code>、单 IP 每日注册上限 <code>regUserCountByIp</code></td><td>同上</td><td>F03-02</td></tr>
+<tr data-fp="F03-02"><td>新环境登录验证手机 <code>deviceDiffValidatePhone</code></td><td>同上</td><td>F03-02</td></tr>
+<tr data-fp="F01-01 F02-03"><td>21 岁弹窗、10 分钟重弹、条款默认勾选</td><td>系统参数 › 注册登陆 › 登入时验证相关参数</td><td>F01-01、F02-03</td></tr>
+<tr data-fp="F04-02"><td>短信通道（M360 / Smart）、每 IP / 每手机号每日上限</td><td>系统参数 › 短信相关</td><td>F04-02</td></tr>
+<tr data-fp="F08-01"><td>生物识别登录</td><td>系统管理 › App 登录设置</td><td>F08-01</td></tr>
+<tr data-fp="F02-01"><td>注册登录页 Banner</td><td>活动配置 › 活动图素材管理 › 注册登录页</td><td>F02-01</td></tr>
+<tr><td>NDRP 名单</td><td>系统管理 › NDRP 名单配置</td><td>KYC 衔接</td></tr>
+</table></div>
+
+<!-- ================= 六 ================= -->
+<h2 id="s6">六、数据与报表</h2>
+<ul>
+<li data-fp="F02-06"><b>新用户注册全链路跟踪</b>（平台概况，马尼拉时间，即 GMT+8）：相关埋点有 <code>login_wheel_click</code>、<code>login</code>、<code>login_method_click</code>（手机号 / Google / Facebook / Telegram）、<code>register_success</code>（phone / google / facebook / telegram / apple，后端上报）。QA 数据显示前端埋点缺报，注册成功人数远大于「选择登录方式」人数（后台知识库 4.13），由 N6 补齐。</li>
+<li data-fp="F04-02"><b>OTP 短信监控报表</b>：OTP 登录成功率 = 5 分钟内完成登录的会话数 ÷ OTP 发送成功的会话数，按运营商分开统计，排除 QA 和 UAT 数据。统计报表 ≥ 90% 为绿灯，80%–90% 为黄灯，低于 80% 为红灯（平台知识库 4.2）；告警阈值为 &lt; 75%（主版 R26）。</li>
+<li><b>登录日志</b>：会员和后台管理员的登录都记在这里，含来源端和 IP 国家。</li>
+<li data-fp="F06-01 F05-01"><b>会员操作日志</b>：三方账号绑定、改密要记录。<span class="warn-1">※ 日志不得明文记录密码、PIN 和密保答案（secuna 曾发现，-5485 已修复），新增日志字段要重新评审。</span></li>
+</ul>
+
+<!-- ================= 七 ================= -->
+<h2 id="s7">七、验收标准</h2>
+<div class="vmark old" data-v="v2.0" style="padding:0">
+<div class="tbl" style="margin:0"><table>
+<tr><th>功能点</th><th>验收项</th></tr>
+<tr data-fp="F01"><td>F01</td><td>1. 冷启动、热启动、H5 刷新三种情况下，弹窗按开关出现。<br>2. 未点同意前，不能操作底层页面。<br>3. 登录 10 分钟后刷新 H5，弹窗按 <code>showAgePopupAfter10Min</code> 开关重新出现。</td></tr>
+<tr data-fp="F02"><td>F02</td><td>1. 手机号输入 08 开头、10 位、12 位、含字母时，均不能发送，并给出对应提示。<br>2. 先用验证码登录 A 账号，再切到密码登录，回填的是 A 账号。<br>3. 30s 内连续两次点 Log in，第二次只提示；绕过前端直接调接口，服务端同样拦截。<br>4. 带邀请码链接进入时 Referral Code 显示且不可改；直接进入时不显示。<br>5. 各端英文文案与文案表一致。</td></tr>
+<tr data-fp="F03"><td>F03</td><td>1. <code>captchaType</code> 取 0、1、2 时，各端展示对应验证形态。<br>2. 人机验证通过后自动发送短信，不需要再点一次。<br>3. 人机验证失败或关闭时不发短信，页面不报验证码必填。<br>4. 密码登录同一账号 5 分钟内失败 3 次后，第 4 次触发图片验证，后台记录触发原因。</td></tr>
+<tr data-fp="F04"><td>F04</td><td>1. 倒计时从 45 开始；中途离开再回来，剩余秒数连续。<br>2. 倒计时结束后出现 Resend code；重发走另一家供应商（查后台短信列表）。<br>3. 连续输错到上限后，按 Q1 结论锁定并提示。<br>4. 测试环境输入 0000 可通过；生产环境 0000 不通过。</td></tr>
+<tr data-fp="F05"><td>F05</td><td>1. 输入 "abcdefgh"、"12345678"、"abc 1234"、含表情的密码，Save 均不可点。<br>2. 输入 "abc12345" 两次一致后 Save 可点，保存成功进入首页。<br>3. 点 Skip 进入首页，之后可在 Account Security 设置密码。</td></tr>
+<tr data-fp="F06"><td>F06</td><td>1. 三方首次登录后出现绑定页；点 Later 进入首页，点提款时再次拦截并引导绑定。<br>2. 绑定成功后可以正常设置密码和提款。<br>3. 绑定后不出现换绑入口。</td></tr>
+<tr data-fp="F07"><td>F07</td><td>1. 未登录和已登录两种入口的手机号带出规则正确。<br>2. 点 "Register/login with verification code" 后回到登录页，并停在验证码 Tab。</td></tr>
+<tr data-fp="F08"><td>F08</td><td>1. 首次登录弹生物识别引导。<br>2. A 设备登录后 B 设备登录同一账号，A 设备提示 1005 并退出。<br>3. 被顶号后再打开 App，不能直接用生物识别登录。</td></tr>
+</table></div>
+<sup class="vtag" data-v="v2.0">v2.0</sup>
+</div>
+<h3 id="s7-1">跨端验收矩阵</h3>
+<div class="tbl"><table>
+<tr><th>验收点</th><th>H5</th><th>PC</th><th>iOS</th><th>Flutter</th></tr>
+<tr data-fp="F01-01"><td>21 岁弹窗冷启动 / 刷新</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr data-fp="F02-01"><td>手机号自动补 0、去重复 0</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr data-fp="F03-01"><td>人机验证三种类型</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr data-fp="F04-01"><td>45s 倒计时离开后连续</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr data-fp="F02-04"><td>两种登录方式回填同一账号</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr data-fp="F02-06"><td>三方登录入口（按 Q3 结论）</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr data-fp="F08-01 F08-02"><td>生物识别引导与顶号后重登</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
+<tr data-fp="F02-07"><td>海外 IP 拦截页</td><td>✓</td><td>✓</td><td>—</td><td>—</td></tr>
+<tr data-fp="F02-07"><td>强更守卫 2615</td><td>—</td><td>—</td><td>✓</td><td>✓</td></tr>
+</table></div>
+
+<!-- ================= 八 ================= -->
+<h2 id="s8">八、上线方式</h2>
+<ul>
+<li><b>发布</b>：本期以统一规则和修复缺陷为主，按升级单模板随版本发布。涉及 App 的改动挂到对应的「IOS1.2.x/Flutter 3.0.x」版本 Epic，子任务按【后端】【H5/后台前端】【IOS/Flutter】拆。</li>
+<li><b>开关</b>：N1–N5 为前端交互和文案调整，不设开关；N6 埋点直接上线。</li>
+<li><b>回滚</b>：文案和交互改动随版本回滚；服务端校验（30s 间隔、8–16 位密码）已在线上，不涉及回滚。</li>
+<li><b>上线后核对</b>：OTP 登录成功率、新用户注册全链路各步 UV（「选择登录方式」应不再明显少于「注册成功」）、登录日志中 1005 和 1004 的数量变化。</li>
+</ul>
+
+<!-- ================= 九 ================= -->
+<h2 id="s9">九、风险与依赖</h2>
+<div class="tbl"><table>
+<tr><th>类型</th><th>风险</th><th>等级</th><th>依据</th></tr>
+<tr data-fp="F01-03"><td>合规</td><td>广告来源和 App 下载页绕过 21 岁弹窗</td><td>高（推测）</td><td>-4778、-5339</td></tr>
+<tr data-fp="F06-01"><td>安全</td><td>Facebook 登录密钥硬编码、JWT 未校验 audience（开发待处理）</td><td>高</td><td>-6709</td></tr>
+<tr><td>安全</td><td>JWT 明文写进日志；充值回跳时 token 出现在 URL（只修了前端）</td><td>高</td><td>-6516、-6595</td></tr>
+<tr data-fp="F03-02"><td>防刷</td><td>换绑和批量注册薅羊毛；「一人多证」需求被否决，同设备限领挂起</td><td>中高</td><td>-1827、-4984、-6281</td></tr>
+<tr data-fp="F08-02"><td>稳定性</td><td>Redis 内存满、频繁驱逐 key，放大误登出</td><td>中</td><td>-6708</td></tr>
+<tr data-fp="F04-02"><td>稳定性</td><td>OTP 首发登录成功率 M360 约 68%、Smart 约 73%</td><td>中</td><td>-3984 截图</td></tr>
+<tr data-fp="F02-04 F02-06"><td>多端一致性</td><td>Telegram 登录在 iOS 偶发失败；登录方式记忆不一致</td><td>中</td><td>-6420、-4548</td></tr>
+<tr><td>依赖</td><td>同盾风控未接入（-6428）；登录相关 Redis key 治理在开发（-6719、-6731）</td><td>—</td><td>主版第 1 章在途表</td></tr>
+</table></div>
+<p><span class="warn-1">※ -6709 Facebook 登录安全修复必须在本需求上线前完成，否则三方登录存在被伪造身份的风险。</span></p>
+
+<!-- ================= 十 ================= -->
+<h2 id="s10">十、未决问题</h2>
+<div class="tbl"><table>
+<tr><th>编号</th><th>问题</th><th>功能点</th></tr>
+<tr data-fp="F04-03"><td>Q1</td><td>短信验证码错误上限和锁定时长是否按 5 次、1 小时执行？锁的是账号还是手机号？</td><td>F04-03</td></tr>
+<tr data-fp="F02-02"><td>Q2</td><td>密码登录失败的锁定阈值和时长是多少？</td><td>F02-02</td></tr>
+<tr data-fp="F02-06"><td>Q3</td><td>App 端是否展示 Google 和 Apple 登录入口？</td><td>F02-06</td></tr>
+<tr data-fp="F05-02"><td>Q4</td><td>验证码注册后，设置密码是否改为必经步骤？</td><td>F05-02</td></tr>
+<tr data-fp="F06-03"><td>Q5</td><td>三方账号绑定的手机号已属于其他账号时，是自动合并（Viber 方案）还是拒绝并引导联系客服？</td><td>F06-03</td></tr>
+<tr data-fp="F08-01"><td>Q6</td><td>生物识别引导点 Not now 后，多久再弹一次？</td><td>F08-01</td></tr>
+<tr data-fp="F02-07"><td>Q7</td><td>账号停用（自我排除）时，登录页的提示文案是什么？</td><td>F02-07</td></tr>
+<tr><td>Q8</td><td>789games 新站是否沿用本文全部规则？</td><td>全部</td></tr>
+<tr id="q9" class="vmark old" data-v="v2.0" data-fp="F01-03"><td>Q9</td><td>广告来源用户和 App 下载页不弹 21 岁弹窗，是否保留？<sup class="vtag" data-v="v2.0">v2.0</sup></td><td>F01-03</td></tr>
+</table></div>
+
+<!-- ================= 十一 ================= -->
+<h2 id="s11">十一、与现有资料的冲突</h2>
+<div class="tbl"><table>
+<tr><th>编号</th><th>冲突点</th><th>说法 A</th><th>说法 B</th><th>以哪个为准</th></tr>
+<tr data-fp="F04-01"><td>C1</td><td>OTP 重发倒计时</td><td>平台知识库 4.1：由 90s 改为 60s（Axure 原型）</td><td>主版 R1：2026-02 起为 45s，App 已对齐（-2712、-3476），录屏文案 "Resend code in 44 S" 印证</td><td><span class="warn-2">※ 45s。Jira 记录更新，且有录屏印证</span></td></tr>
+<tr data-fp="F04-03"><td>C2</td><td>验证码错误上限</td><td>平台知识库 4.1：共 5 次，用完锁定账号 1 小时</td><td>主版视频补充第 3 条：推测 5 次，没有定值</td><td>暂按 5 次、锁 1 小时，待 Q1 确认</td></tr>
+<tr data-fp="F02-06"><td>C3</td><td>App 三方登录入口</td><td>平台知识库 4.1：App 端暂时隐藏 Google 和 Apple 登录</td><td>主版第 1 章：iOS 另有 Apple 登录（-4956 等）；原型画了 Apple 入口</td><td>待 Q3 确认</td></tr>
+<tr data-fp="F02-01"><td>C4</td><td>手机号格式错误文案</td><td>App 录屏："Mobile number must start with 09"（-1980）</td><td>平台知识库 4.1："Please enter a mobile number starting with 09."</td><td>按 N4 统一为后者，待评审</td></tr>
+<tr data-fp="F02-03"><td>C5</td><td>条款是否默认勾选</td><td>平台知识库 4.1：默认勾选</td><td>后台 QA 参数 <code>registerTermsDefaultCheckedSwitch</code> = 0</td><td>以后台开关为准；生产值资料未覆盖</td></tr>
+<tr data-fp="F06-02"><td>C6</td><td>提款密码</td><td>平台知识库 4.3：已取消提现密码</td><td>主版：聊天室红包点 Send 后验 4 位提款密码（PD/1158635）</td><td>提现不再需要提款密码，红包仍需要。F06 文案只提「提款」和「登录密码」</td></tr>
+<tr data-fp="F01-01"><td>C7</td><td>21 岁弹窗时机</td><td>平台知识库 4.1：只在进入首页时出现，登录 10 分钟后刷新重弹</td><td>主版 R12：登录前后都弹，登录后由开关控制</td><td>两者合并：登录前必弹；登录后和 10 分钟重弹各按开关</td></tr>
+</table></div>
+
+<!-- ================= 附录 ================= -->
+<h2 id="apx-a">附录 A：评审清单核对</h2>
+<div class="vmark old" data-v="v2.0" style="padding:0">
+<p style="margin:.3rem 6px">对照主版「四、通用需求评审清单」12 项：<sup class="vtag" data-v="v2.0">v2.0</sup></p>
+<div class="tbl" style="margin:0"><table>
+<tr><th>项</th><th>结论</th><th>位置</th></tr>
+<tr><td>1. 合规</td><td>21 岁弹窗、NDRP 和 KYC 衔接已写；绕过场景列入 Q9</td><td>F01、二.2</td></tr>
+<tr><td>2. 资金</td><td>不涉及动钱；提款前置条件（绑手机号）已写</td><td>F06-02</td></tr>
+<tr><td>3. 口径</td><td>时区 GMT+8；不涉及金额小数位</td><td>文首、第六章</td></tr>
+<tr><td>4. 防刷与风控</td><td>注册风控、图片验证触发规则、账号状态已写</td><td>F02-07、F03-02、G8</td></tr>
+<tr><td>5. 多端范围</td><td>已写</td><td>第四章</td></tr>
+<tr><td>6. 后台配套</td><td>只用现有配置，已列位置</td><td>第五章</td></tr>
+<tr><td>7. 系统约束</td><td>复用现有短信、人机验证能力；设备级限领未落地</td><td>F03、第九章</td></tr>
+<tr><td>8. 性能</td><td>依赖 Redis key 治理（-6719、-6731）</td><td>第九章</td></tr>
+<tr><td>9. 安全</td><td>token 不进 URL 和日志；FB 登录修复前置</td><td>第六章、第九章</td></tr>
+<tr><td>10. 上线方式</td><td>已写</td><td>第八章</td></tr>
+<tr><td>11. 验收</td><td>已写，含边界值和跨端矩阵</td><td>第七章</td></tr>
+<tr><td>12. 工单规范</td><td>子任务拆分方式已写</td><td>第八章</td></tr>
+</table></div>
+</div>
+
+<h2 id="apx-b">附录 B：原型对照</h2>
+<div class="vmark" data-v="v2.2" style="padding:0">
+<p style="margin:.3rem 6px">原型中英文文案未在资料中出现的，原型批注里标为「示意」。真实环境才有的效果（收到短信、三方授权、另一设备登录）用模拟按钮演示。<sup class="vtag" data-v="v2.2">v2.2</sup></p>
+<div class="tbl" style="margin:0"><table>
+<tr><th>原型页面</th><th>功能点</th><th>可演示的交互</th></tr>
+<tr data-fp="F01"><td><a href="../prototype/front/age-gate.html">21 岁确认弹窗</a></td><td>F01</td><td>同意、退出、广告来源不弹、10 分钟后重弹</td></tr>
+<tr data-fp="F02"><td><a href="../prototype/front/login.html">登录注册页</a></td><td>F02</td><td>Tab 切换、手机号补 0 与校验、× 清空、账号超长、条款拦截、邀请码显示、记住登录、30s 间隔、密码错误与风险验证、三方入口按端变化、停用 / 冻结 / 2615 / 海外 IP</td></tr>
+<tr data-fp="F03"><td><a href="../prototype/front/captcha.html">人机验证</a></td><td>F03</td><td>三种 captchaType、图形码位数不足、验证失败不发短信</td></tr>
+<tr data-fp="F04"><td><a href="../prototype/front/otp.html">短信验证码</a></td><td>F04</td><td>发送成功提示、45s 倒计时离开后连续、重发、粘贴、输错剩余次数与锁定、新老用户分流</td></tr>
+<tr data-fp="F05"><td><a href="../prototype/front/set-password.html">新用户设置密码</a></td><td>F05</td><td>三条规则实时提示、两次不一致、Skip、重置密码模式</td></tr>
+<tr data-fp="F06"><td><a href="../prototype/front/bind-phone.html">三方登录绑定手机号</a></td><td>F06</td><td>绑定流程、Later、号码已被占用、受限账号</td></tr>
+<tr data-fp="F07"><td><a href="../prototype/front/forgot-password.html">找回密码</a></td><td>F07</td><td>两个入口、已登录带出手机号、Mismatch phone no.、三方账号无手机号引导</td></tr>
+<tr data-fp="F08"><td><a href="../prototype/front/home.html">登录成功</a></td><td>F08</td><td>生物识别引导、另一设备登录 1005、未绑手机号拦截提款和设密码、冻结账号操作弹窗</td></tr>
+</table></div>
+<sup class="vtag" data-v="v2.2">v2.2</sup>
+</div>
+
+</main>
+</div>
+
+<script>window.NAV_ROOT = "../";</script>
+<script src="../assets/nav-data.js"></script>
+<script src="../assets/nav.js"></script>
+<script>
+(function () {
+  /* 功能点名称（与 checklist.html 保持一致） */
+  var FP = {
+    F01: "21 岁确认弹窗", "F01-01": "弹出时机", "F01-02": "弹窗内容与操作", "F01-03": "不弹窗的场景",
+    F02: "登录注册页", "F02-01": "手机号输入与校验", "F02-02": "账号密码登录", "F02-03": "条款与邀请码", "F02-04": "登录方式记忆", "F02-05": "登录间隔", "F02-06": "三方登录入口", "F02-07": "账号状态与访问拦截",
+    F03: "人机验证", "F03-01": "发送验证码前的人机验证", "F03-02": "密码登录风险触发验证",
+    F04: "短信验证码", "F04-01": "发送与重发倒计时", "F04-02": "短信供应商", "F04-03": "输入与错误次数", "F04-04": "长时间未登录需短信验证", "F04-05": "测试环境验证码",
+    F05: "设置密码", "F05-01": "密码规则校验", "F05-02": "跳过与保存",
+    F06: "三方登录绑定手机号", "F06-01": "绑定引导与流程", "F06-02": "未绑定手机号的限制", "F06-03": "号码冲突与受限账号",
+    F07: "找回密码", "F07-01": "入口", "F07-02": "重置流程与校验",
+    F08: "登录成功", "F08-01": "生物识别引导", "F08-02": "单设备在线与互踢", "F08-03": "注册后消息与默认昵称"
+  };
+  var doc = document.getElementById("doc");
+
+  /* 功能点锚点：每个编号的第一处内容作为 id */
+  Object.keys(FP).forEach(function (code) {
+    if (document.getElementById(code)) return;
+    var el = code.length === 3 ? document.getElementById("pg-" + code) : doc.querySelector('li[data-fp~="' + code + '"], tr[data-fp~="' + code + '"]');
+    if (!el) el = doc.querySelector('[data-fp~="' + code + '"]');
+    if (el) { var a = document.createElement("span"); a.id = code; a.style.position = "relative"; a.style.top = "-70px"; el.insertBefore(a, el.firstChild); }
+  });
+
+  /* 全文目录：按正文 h2 / h3 自动生成 */
+  var list = document.getElementById("toc-list"), curOl = null;
+  doc.querySelectorAll("h2, h3").forEach(function (h) {
+    if (h.id === "toc") return;
+    if (!h.id) h.id = "h-" + Math.random().toString(36).slice(2, 8);
+    var li = document.createElement("li"), a = document.createElement("a");
+    a.href = "#" + h.id; a.textContent = h.textContent; li.appendChild(a);
+    if (h.tagName === "H2") { list.appendChild(li); curOl = document.createElement("ol"); li.appendChild(curOl); }
+    else if (curOl) curOl.appendChild(li);
+  });
+  list.querySelectorAll("ol").forEach(function (o) { if (!o.children.length) o.remove(); });
+
+  /* 版本标注：最新版荧光黄，更早版本调浅；角标显示该版本概述 */
+  var rows = [].slice.call(document.querySelectorAll("#vtable tr[data-v]"));
+  var latest = rows[0].dataset.v, sum = {};
+  rows.forEach(function (r) { sum[r.dataset.v] = r.dataset.sum; });
+  doc.querySelectorAll(".vmark").forEach(function (m) { if (m.dataset.v !== latest) m.classList.add("old"); });
+  var tip = null;
+  doc.querySelectorAll(".vtag").forEach(function (t) {
+    var v = t.dataset.v;
+    t.setAttribute("tabindex", "0");
+    t.setAttribute("title", v + "：" + (sum[v] || ""));
+    t.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (tip) tip.remove();
+      tip = document.createElement("div"); tip.className = "vtip"; tip.textContent = v + "：" + (sum[v] || "");
+      document.body.appendChild(tip);
+      var r = t.getBoundingClientRect();
+      tip.style.left = Math.max(8, Math.min(r.left + window.scrollX, window.innerWidth - 280)) + "px";
+      tip.style.top = (r.bottom + window.scrollY + 6) + "px";
+    });
+  });
+  document.addEventListener("click", function () { if (tip) { tip.remove(); tip = null; } });
+
+  /* 「查看详细（共 XX 项）」 */
+  document.querySelectorAll("[data-chg]").forEach(function (b) {
+    var ul = document.getElementById(b.dataset.chg), n = ul.children.length;
+    b.textContent = "查看详细（共 " + n + " 项）";
+    b.onclick = function () { ul.hidden = !ul.hidden; b.textContent = (ul.hidden ? "查看详细" : "收起") + "（共 " + n + " 项）"; };
+  });
+
+  /* 荧光粉：只在网址以 #功能点编号 结尾时出现（来自功能自查清单） */
+  var banner = document.getElementById("fp-banner");
+  function clearHit() {
+    doc.querySelectorAll(".fp-hit").forEach(function (e) { e.classList.remove("fp-hit"); });
+    banner.hidden = true;
+  }
+  function applyHit() {
+    var code = decodeURIComponent(location.hash.slice(1));
+    if (!/^F\d{2}(-\d{2})?$/.test(code) || !FP[code]) { clearHit(); return; }
+    clearHit();
+    var hits = 0;
+    doc.querySelectorAll("[data-fp]").forEach(function (e) {
+      var ok = e.dataset.fp.split(/\s+/).some(function (c) { return c === code || c.indexOf(code + "-") === 0; });
+      if (ok) { e.classList.add("fp-hit"); hits++; }
+    });
+    var name = code.length > 3 ? code.slice(0, 3) + " " + FP[code.slice(0, 3)] + " › " + code + " " + FP[code] : code + " " + FP[code];
+    document.getElementById("fp-text").textContent = "正在查看：" + name + "（共标出 " + hits + " 处）";
+    banner.hidden = false;
+    var target = document.getElementById(code);
+    if (target) setTimeout(function () { target.scrollIntoView({ block: "start" }); }, 30);
+  }
+  document.getElementById("fp-clear").onclick = function () {
+    clearHit();
+    history.replaceState(null, "", location.pathname + location.search);
+  };
+  window.addEventListener("hashchange", applyHit);
+  applyHit();
+})();
+</script>
+</body>
+</html>

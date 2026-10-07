@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>注册登录自查清单</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="with-nav">
+<main class="doc" style="max-width:980px">
+  <header class="doc-head">
+    <h1>功能自查清单</h1>
+    <div class="meta"><span>注册登录 · 对应 PRD v2.2</span><span>日期 2026-10-07</span><span>功能点 F01–F08</span></div>
+  </header>
+  <p class="muted">给设计、前端、后端和测试按角色自查。点功能点后的「查看PRD」跳到 PRD 对应位置，相关内容会用荧光粉标出。清单从 PRD 生成，PRD 改动时同步更新；本清单在 v2.2 首次生成，所以没有版本标注。</p>
+  <p><span class="warn-3">※ 勾选状态只保存在当前浏览器里，换电脑或换浏览器后看不到；需要留档请用「导出 CSV」。</span></p>
+
+  <div class="ck-top">
+    <div class="roles" role="group" aria-label="角色视角" id="roles"></div>
+    <div class="total" id="total"></div>
+    <div class="tools"><button type="button" id="csv">导出 CSV</button> <button type="button" id="print">打印</button> <button type="button" id="clear">清空当前角色的勾选</button></div>
+  </div>
+
+  <div id="list"></div>
+</main>
+</div>
+
+<script>window.NAV_ROOT = "../";</script>
+<script src="../assets/nav-data.js"></script>
+<script src="../assets/nav.js"></script>
+<script>
+/* 角色：d 设计 / f 前端开发 / b 后端开发 / q 测试。cat：正常流程 / 边界值 / 异常情况 / 非常规操作 */
+var ROLES = [["all", "全部"], ["d", "设计"], ["f", "前端开发"], ["b", "后端开发"], ["q", "测试"]];
+var DATA = [
+ { code: "F01", name: "21 岁确认弹窗", subs: [
+  { code: "F01-01", name: "弹出时机", items: [
+   ["正常流程", "dfq", "冷启动 App、热启动、H5 刷新时弹窗是否按开关出现", "登录前必弹；登录后按开关；iOS 冷启动也弹"],
+   ["边界值", "fq", "登录满 10 分钟前后各刷新一次 H5", "不满 10 分钟不重弹；超过 10 分钟按 showAgePopupAfter10Min 开关重弹"],
+   ["异常情况", "b", "后台关闭「登录后弹窗」开关后的表现", "开关默认值写清楚；关闭后登录后不弹，登录前仍弹"],
+   ["非常规操作", "fq", "弹窗出现时尝试点击或滚动底层页面、按返回键", "底层不可操作；返回键不能绕过弹窗"]
+  ]},
+  { code: "F01-02", name: "弹窗内容与操作", items: [
+   ["正常流程", "dq", "弹窗内容包含 21 岁声明、求助机构信息、禁止在公共场所游戏", "与 PAGCOR 审计调整后的版本一致（-6377）"],
+   ["正常流程", "df", "App 为单按钮 \"I agree with all of the above\"，Exit 退出", "按钮文案和各端一致；H5 形态见第四章"],
+   ["非常规操作", "fq", "快速连点同意按钮", "只触发一次跳转"]
+  ]},
+  { code: "F01-03", name: "不弹窗的场景", items: [
+   ["正常流程", "q", "用 Google 广告来源链接进入", "按现状不弹、直接进转盘；Q9 结论出来后再改"],
+   ["异常情况", "bq", "App 下载页、指定代理线引导页是否绕过弹窗", "绕过场景全部列出，与合规确认（Q9）"]
+  ]}
+ ]},
+ { code: "F02", name: "登录注册页", subs: [
+  { code: "F02-01", name: "手机号输入与校验", items: [
+   ["正常流程", "fq", "获得焦点时自动填 0；输入 009… 时去掉多余的 0；只能输入数字", "最终值为 09 开头的 11 位"],
+   ["边界值", "fq", "输入 10 位、11 位、12 位、08 开头", "只有 09 开头 11 位能发送；错误提示 \"Please enter a mobile number starting with 09.\"（N4）"],
+   ["异常情况", "fq", "未输入就点 Send code；点 × 清空", "提示 \"This field is required\"；人机弹窗出来前不报验证码必填"],
+   ["正常流程", "d", "错误态、聚焦态、禁用态的输入框样式和各端一致", "红框 + 红字；深色模式可读"],
+   ["非常规操作", "b", "绕过前端提交非 09 开头或非 11 位的号码", "服务端拒绝，不发短信"]
+  ]},
+  { code: "F02-02", name: "账号密码登录", items: [
+   ["正常流程", "fq", "账号 hint 为 \"Phone/GCash/Maya\"，正确账密登录", "登录成功进入首页"],
+   ["边界值", "fq", "账号输入 20 位、21 位", "第 21 位不能输入，提示 \"Content cannot exceed 20 characters\""],
+   ["异常情况", "bq", "连续输错密码", "提示剩余次数；锁定阈值和时长按 Q2 结论"],
+   ["非常规操作", "b", "日志和接口返回中检查密码字段", "密码不明文落日志、不出现在 URL 或返回里"]
+  ]},
+  { code: "F02-03", name: "条款与邀请码", items: [
+   ["正常流程", "fq", "后台「条款默认勾选」开关打开和关闭", "页面勾选状态跟随开关（C5）"],
+   ["异常情况", "fq", "未勾选条款就点 Send code 或三方登录", "不发请求，Toast 提示勾选（N3）"],
+   ["正常流程", "fq", "通过邀请链接和直接进入两种方式打开", "邀请链接显示 Referral Code、自动带入、不可改；直接进入不显示"],
+   ["非常规操作", "b", "篡改请求里的邀请码", "服务端以链接带入的归属为准，不接受前端改写"]
+  ]},
+  { code: "F02-04", name: "登录方式记忆", items: [
+   ["正常流程", "fq", "验证码登录 A 账号后退出，再进登录页并切到密码 Tab", "自动选中上次方式，两种方式回填同一账号（-4548）"],
+   ["非常规操作", "fq", "同一设备切换 B 账号登录后再退出", "回填的是 B 账号，不是 A"]
+  ]},
+  { code: "F02-05", name: "登录间隔", items: [
+   ["边界值", "fq", "第 29 秒和第 31 秒再次点 Log in", "29 秒提示 \"Please wait at least 30 seconds…\"；31 秒正常发起"],
+   ["非常规操作", "b", "绕过前端在 30 秒内连续调用登录接口", "服务端同样拦截"],
+   ["非常规操作", "q", "快速连点 Log in 按钮", "只发起一次请求"]
+  ]},
+  { code: "F02-06", name: "三方登录入口", items: [
+   ["正常流程", "dfq", "H5、iOS、Flutter 三端分别查看入口", "按 Q3 结论展示；iOS 的 Apple 入口按结论保留或隐藏"],
+   ["异常情况", "fq", "非主域名访问时的三方入口", "三方登录只在主域名开放"],
+   ["正常流程", "f", "点击各登录方式时的埋点", "上报 login_method_click，值与 register_success 对应（N6）"],
+   ["非常规操作", "bq", "Telegram 登录在 iOS 上反复登录", "不出现偶发失败（-6420）"]
+  ]},
+  { code: "F02-07", name: "账号状态与访问拦截", items: [
+   ["异常情况", "bq", "停用（自我排除）账号登录", "拦截，文案按 Q7"],
+   ["异常情况", "fq", "冻结账号登录后点充值、提现", "可以登录；操作时弹后台填写的原因（≤ 50 字符）"],
+   ["异常情况", "bq", "老版本 App 登录", "返回 2615 引导升级，不计入登录失败次数"],
+   ["异常情况", "fq", "H5 用海外 IP 访问；App 用海外 IP 访问", "H5 显示拦截页；App 不拦；TG 登录路径不拦"]
+  ]}
+ ]},
+ { code: "F03", name: "人机验证", subs: [
+  { code: "F03-01", name: "发送验证码前的人机验证", items: [
+   ["正常流程", "dfq", "captchaType 分别设为 1、2、0", "各端展示 Cloudflare、腾讯滑块、数字图形码"],
+   ["正常流程", "fq", "通过验证后", "自动发送短信，不需要再点一次"],
+   ["边界值", "fq", "数字图形码输入 3 位", "提示 \"Please enter 4-digit verification code\""],
+   ["异常情况", "fq", "验证失败或点取消", "不发短信，返回原页面，不报验证码必填"],
+   ["异常情况", "b", "Cloudflare 服务不可用", "不会自动切换（相关需求已否决）；运营可手动改 captchaType，修改记操作日志"]
+  ]},
+  { code: "F03-02", name: "密码登录风险触发验证", items: [
+   ["正常流程", "bq", "同一账号 5 分钟内输错 3 次后再登录", "触发图片验证，后台落库触发原因"],
+   ["边界值", "bq", "第 3 次失败在第 4 分 59 秒和第 5 分 01 秒", "窗口内触发，窗口外不触发"],
+   ["非常规操作", "bq", "同一 IP 5 分钟内登录超过 3 个账号；模拟器登录", "触发图片验证"],
+   ["异常情况", "b", "同一浏览器产生多个设备指纹", "不能因指纹抖动频繁误触发（-5963）"]
+  ]}
+ ]},
+ { code: "F04", name: "短信验证码", subs: [
+  { code: "F04-01", name: "发送与重发倒计时", items: [
+   ["正常流程", "fq", "发送成功后", "提示 \"Verification code sent successfully\"；显示 \"Resend code in 44 S\""],
+   ["边界值", "fq", "倒计时到 0 秒", "出现 Resend code，可点击"],
+   ["非常规操作", "fq", "倒计时中返回上一页再进入、切到后台再回来", "剩余秒数连续，不重置（-1882、-3476）"],
+   ["正常流程", "d", "号码展示", "前 3 后 4，中间用 * 隐藏"]
+  ]},
+  { code: "F04-02", name: "短信供应商", items: [
+   ["正常流程", "bq", "首次发送和 60 秒内重发", "首发走用户所属运营商；重发轮换 Smart / Globe（后台短信列表可查）"],
+   ["异常情况", "b", "供应商返回 opted-out", "切到 Smart，并给友好提示"],
+   ["边界值", "b", "同一手机号、同一 IP 当天发送达到上限", "提示超限；上限以后台配置为准"],
+   ["正常流程", "b", "OTP 监控报表口径", "按运营商分开统计，排除 QA / UAT 数据，时间按 GMT+8"]
+  ]},
+  { code: "F04-03", name: "输入与错误次数", items: [
+   ["正常流程", "fq", "粘贴 4 位验证码", "自动填满 4 格"],
+   ["异常情况", "fq", "输错验证码", "提示 \"Invalid verification code, you still have N times left\""],
+   ["边界值", "bq", "连续输错到上限", "按 Q1 结论锁定（暂按 5 次、1 小时）；锁定期内不能再验证"],
+   ["边界值", "b", "锁定时间跨过 GMT+8 零点", "锁定时长按实际经过时间计算，不因跨天提前解锁"],
+   ["异常情况", "fq", "10 天未登录账号输入正确验证码", "一次通过，不出现第一次无反应（-2264）；输错不弹冻结弹窗（-5706）"]
+  ]},
+  { code: "F04-04", name: "长时间未登录需短信验证", items: [
+   ["正常流程", "bq", "超过 needOtpLogin 天数未登录的账号用密码登录", "密码正确后还要过短信验证"],
+   ["边界值", "b", "未登录天数刚好等于配置值", "边界按配置口径执行，口径写进接口文档"]
+  ]},
+  { code: "F04-05", name: "测试环境验证码", items: [
+   ["正常流程", "q", "UAT / QAT 输入 0000", "验证通过，不真实发送短信"],
+   ["异常情况", "bq", "生产环境输入 0000", "不通过"]
+  ]}
+ ]},
+ { code: "F05", name: "设置密码", subs: [
+  { code: "F05-01", name: "密码规则校验", items: [
+   ["正常流程", "dfq", "输入密码时规则提示", "三条规则实时变色（N1）"],
+   ["边界值", "fq", "输入 7、8、16、17 位", "8 和 16 位可保存；7 位不可保存；第 17 位不能输入"],
+   ["异常情况", "fq", "只有字母、只有数字、含空格、含表情或中文", "Save 不可点"],
+   ["异常情况", "fq", "两次输入不一致", "提示 \"Passwords do not match\"，Save 不可点（N2）"],
+   ["非常规操作", "b", "绕过前端提交 7 位或 17 位密码", "服务端返回 code 15242"],
+   ["非常规操作", "b", "会员操作日志", "记录改密动作，不记录密码明文"]
+  ]},
+  { code: "F05-02", name: "跳过与保存", items: [
+   ["正常流程", "fq", "新用户点 Skip", "进入首页；之后可在 Account Security 设置"],
+   ["正常流程", "fq", "找回密码进入本页", "没有 Skip；保存后回登录页"],
+   ["非常规操作", "fq", "连点 Save", "只提交一次"]
+  ]}
+ ]},
+ { code: "F06", name: "三方登录绑定手机号", subs: [
+  { code: "F06-01", name: "绑定引导与流程", items: [
+   ["正常流程", "fq", "三方首次登录", "进入绑定页；可点 Later"],
+   ["正常流程", "fq", "绑定流程", "复用手机号规则、人机验证、短信验证码"],
+   ["正常流程", "b", "Facebook 绑定", "写入会员日志"],
+   ["异常情况", "b", "Facebook 登录 JWT 校验", "校验 audience，密钥不硬编码（-6709 修复后验证）"],
+   ["非常规操作", "fq", "绑定成功后查找换绑入口", "没有换绑入口"]
+  ]},
+  { code: "F06-02", name: "未绑定手机号的限制", items: [
+   ["正常流程", "fq", "未绑定时点提现、设置登录密码", "先引导绑定手机号"],
+   ["正常流程", "bq", "未绑定时参与新用户转盘第 2 次抽奖", "被拦截并引导绑定（-5754）"],
+   ["非常规操作", "b", "未绑定账号直接调提现接口", "服务端拦截"]
+  ]},
+  { code: "F06-03", name: "号码冲突与受限账号", items: [
+   ["异常情况", "bq", "绑定已属于其他账号的手机号", "按 Q5 结论处理"],
+   ["异常情况", "bq", "冻结或自我排除账号用三方登录", "提示账号受限"],
+   ["非常规操作", "b", "同一手机号并发绑定两个三方账号", "只有一个成功，不产生两个账号共用一个手机号"]
+  ]}
+ ]},
+ { code: "F07", name: "找回密码", subs: [
+  { code: "F07-01", name: "入口", items: [
+   ["正常流程", "fq", "点 \"Register/login with verification code\"", "回到登录页并停在验证码 Tab"],
+   ["正常流程", "fq", "从 Account Security 进入", "手机号带出且不可改"]
+  ]},
+  { code: "F07-02", name: "重置流程与校验", items: [
+   ["正常流程", "fq", "手机号 → 人机验证 → 短信验证码 → 设置新密码", "全流程走通，新密码规则同 F05-01"],
+   ["异常情况", "bq", "手机号与账号不一致", "提示 \"Mismatch phone no.\""],
+   ["异常情况", "fq", "未绑手机号的三方账号找回密码", "引导改用验证码或三方登录（N5）"],
+   ["非常规操作", "fq", "切换账号后进入找回密码", "不残留上一个账号的频控提示（-885）"]
+  ]}
+ ]},
+ { code: "F08", name: "登录成功", subs: [
+  { code: "F08-01", name: "生物识别引导", items: [
+   ["正常流程", "dfq", "iOS / Flutter 首次登录", "弹 \"Enable Biometric Login\" 引导"],
+   ["正常流程", "b", "后台「App 登录设置」", "扫脸 / 指纹、失败次数上限、开关按 iOS / 安卓分别生效"],
+   ["异常情况", "fq", "已录入人脸的设备", "引导正常出现，个人中心有开关（-4828）"],
+   ["边界值", "fq", "点 Not now 后再次登录", "按 Q6 结论控制再弹间隔"]
+  ]},
+  { code: "F08-02", name: "单设备在线与互踢", items: [
+   ["正常流程", "bfq", "A 设备登录后，B 设备登录同一账号", "A 设备提示 code 1005 并退出"],
+   ["非常规操作", "fq", "被顶号后打开 App", "不能用生物识别，要完整登录"],
+   ["异常情况", "b", "Redis key 被驱逐、refresh 失败", "不出现误登出或误弹异地登录（-6708、-6317）"]
+  ]},
+  { code: "F08-03", name: "注册后消息与默认昵称", items: [
+   ["正常流程", "bq", "新用户注册成功", "收到 Registration Info 和 KYC Verification Reminder 站内信"],
+   ["正常流程", "dq", "默认昵称", "Player + 5 位随机数 + 手机号后 4 位"]
+  ]}
+ ]}
+];
+
+var role = "all";
+try { role = localStorage.getItem("rl-ck-role") || "all"; } catch (e) {}
+var store = {};
+try { store = JSON.parse(localStorage.getItem("rl-ck-v2.2") || "{}"); } catch (e) {}
+function save() { try { localStorage.setItem("rl-ck-v2.2", JSON.stringify(store)); localStorage.setItem("rl-ck-role", role); } catch (e) {} }
+function key(id) { return role + ":" + id; }
+function vis(it) { return role === "all" || it[1].indexOf(role) >= 0; }
+var RN = { d: "设计", f: "前端", b: "后端", q: "测试" };
+
+function render() {
+  var html = "";
+  DATA.forEach(function (fp) {
+    var subsHtml = "";
+    fp.subs.forEach(function (s) {
+      var lis = "";
+      s.items.forEach(function (it, i) {
+        if (!vis(it)) return;
+        var id = s.code + "-" + (i + 1), on = !!store[key(id)];
+        lis += '<li class="' + (on ? "done" : "") + '"><input type="checkbox" data-id="' + id + '"' + (on ? " checked" : "") + ' aria-label="' + it[2].replace(/"/g, "&quot;") + '">' +
+          '<div><span class="txt"><span class="cat">' + it[0] + "</span>" + it[2] +
+          '<span class="rl">' + it[1].split("").map(function (r) { return RN[r]; }).join(" / ") + "</span></span>" +
+          '<span class="exp">预期：' + it[3] + "</span></div></li>";
+      });
+      if (!lis) return;
+      subsHtml += '<div class="subhead" data-sub="' + s.code + '"><h4>' + s.code + " " + s.name + '</h4><span class="pct"></span><a class="gopr" href="prd.html#' + s.code + '">查看PRD</a></div><ul class="items">' + lis + "</ul>";
+    });
+    if (!subsHtml) return;
+    html += '<section class="fpbox" data-fp="' + fp.code + '"><div class="fphead"><h3>' + fp.code + " " + fp.name + '</h3><span class="pct"></span><a class="gopr" href="prd.html#' + fp.code + '">查看PRD</a></div>' + subsHtml + "</section>";
+  });
+  document.getElementById("list").innerHTML = html;
+  calc();
+}
+function pctOf(boxes) {
+  var n = boxes.length, c = boxes.filter(function (b) { return b.checked; }).length;
+  return { n: n, c: c, p: n ? Math.round(c * 100 / n) : 0 };
+}
+function bar(r) { return "完成度 " + r.p + "%（" + r.c + "/" + r.n + '）<span class="bar"><i style="width:' + r.p + '%"></i></span>'; }
+function calc() {
+  document.querySelectorAll(".fpbox").forEach(function (sec) {
+    sec.querySelector(".fphead .pct").innerHTML = bar(pctOf([].slice.call(sec.querySelectorAll("input"))));
+    sec.querySelectorAll(".subhead").forEach(function (h) {
+      h.querySelector(".pct").innerHTML = bar(pctOf([].slice.call(h.nextElementSibling.querySelectorAll("input"))));
+    });
+  });
+  var t = pctOf([].slice.call(document.querySelectorAll("#list input")));
+  document.getElementById("total").innerHTML = "总" + bar(t);
+}
+document.getElementById("list").addEventListener("change", function (e) {
+  var b = e.target; if (!b.dataset.id) return;
+  if (b.checked) store[key(b.dataset.id)] = 1; else delete store[key(b.dataset.id)];
+  b.closest("li").classList.toggle("done", b.checked);
+  save(); calc();
+});
+var rb = document.getElementById("roles");
+ROLES.forEach(function (r) {
+  var b = document.createElement("button"); b.type = "button"; b.textContent = r[1]; b.dataset.r = r[0];
+  b.setAttribute("aria-pressed", r[0] === role);
+  b.onclick = function () { role = r[0]; rb.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.r === role); }); save(); render(); };
+  rb.appendChild(b);
+});
+document.getElementById("clear").onclick = function () {
+  Object.keys(store).forEach(function (k) { if (k.indexOf(role + ":") === 0) delete store[k]; });
+  save(); render();
+};
+document.getElementById("print").onclick = function () { window.print(); };
+document.getElementById("csv").onclick = function () {
+  var rows = [["角色视角", "大功能点", "子功能点", "编号", "类别", "适用角色", "检查什么", "预期结果", "已勾选"]];
+  DATA.forEach(function (fp) { fp.subs.forEach(function (s) { s.items.forEach(function (it, i) {
+    if (!vis(it)) return;
+    var id = s.code + "-" + (i + 1);
+    rows.push([ROLES.filter(function (r) { return r[0] === role; })[0][1], fp.code + " " + fp.name, s.code + " " + s.name, id, it[0],
+      it[1].split("").map(function (r) { return RN[r]; }).join("/"), it[2], it[3], store[key(id)] ? "是" : "否"]);
+  }); }); });
+  var csv = "﻿" + rows.map(function (r) { return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(","); }).join("\r\n");
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  a.download = "register-login-checklist-v2.2.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+};
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>21 岁确认弹窗 · 注册登录原型</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="with-nav">
+<div class="proto">
+  <div class="proto-head">
+    <p class="muted" style="margin:0">原型页面 › 前台页面</p>
+    <h1>21 岁确认弹窗</h1>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="sb"><span>9:41</span><span>5G ▮▮▮</span></div>
+    <section class="view">
+      <div class="logo">789<b>.</b></div>
+      <div class="banner">Welcome to 789 · PAGCOR licensed</div>
+    </section>
+    <div class="ov" id="age">
+      <div class="dlg" role="dialog" aria-modal="true" aria-labelledby="age-t">
+        <div class="big">21+</div>
+        <h3 id="age-t">Before you continue</h3>
+        <ul>
+          <li>I am at least 21 years old.</li>
+          <li>I am not a government official or employee.</li>
+          <li>I am not on the NDRP exclusion list.</li>
+          <li>Playing in public places is strictly prohibited.</li>
+          <li>Need help with problem gambling? Contact the support hotline listed in our Terms.</li>
+        </ul>
+        <button class="btn" id="agree">I agree with all of the above</button>
+        <button class="btn ghost" id="exit">Exit</button>
+      </div>
+    </div>
+    <div class="toast" id="toast" hidden></div>
+  </div></div>
+
+  <aside class="notes" aria-label="规则批注">
+    <h2>规则批注</h2>
+    <p class="sub">对应 PRD 功能点 F01。<a href="../../docs/prd.html#pg-F01">查看 PRD</a></p>
+    <ol>
+      <li><span class="fp">F01-01</span>登录前必弹；登录后是否弹由后台开关控制；登录超过 10 分钟后刷新要重弹，也由开关控制。<span class="ref">-1209 -2606 平台知识库 4.1</span></li>
+      <li><span class="fp">F01-02</span>单按钮 "I agree with all of the above"；未同意前不能操作底层页面；点 Exit 退出。<span class="ref">-3289</span></li>
+      <li><span class="fp">F01-02</span>弹窗含求助机构信息，以及 "Playing in public places is strictly prohibited"（已从登录页移入弹窗）。求助机构那一行的原型文案为示意，正式文案资料未覆盖。<span class="ref">-5364 -6377</span></li>
+      <li><span class="fp">F01-03</span>Google 广告来源用户不弹，直接进转盘；App 下载页独立 HTML 也不弹。<span class="warn-1">※ 绕过 21 岁确认属于合规风险，是否保留见 Q9。</span><span class="ref">-4778 -5339</span></li>
+      <li><span class="fp">F01-01</span>同意后的顺序：21 岁弹窗 → 新用户转盘（不在本需求范围）→ 登录页。<span class="ref">平台知识库 4.1</span></li>
+    </ol>
+    <h3>模拟操作</h3>
+    <div class="sim">
+      <button type="button" id="sim-ad"><span class="simtag">模拟</span>Google 广告来源进入（不弹窗）</button>
+      <button type="button" id="sim-10"><span class="simtag">模拟</span>登录 10 分钟后刷新（重弹）</button>
+    </div>
+    <div class="pager"><span></span><a href="login.html">下一页：登录注册页 →</a></div>
+  </aside>
+</div>
+</div>
+<script>window.NAV_ROOT = "../../";</script>
+<script src="../../assets/nav-data.js"></script>
+<script src="../../assets/nav.js"></script>
+<script src="../../assets/proto.js"></script>
+<script>
+document.getElementById("agree").onclick = function () { P.go("login.html"); };
+document.getElementById("exit").onclick = function () { P.toast("已退出（真机上关闭 App 或页面）"); };
+document.getElementById("sim-ad").onclick = function () {
+  document.getElementById("age").hidden = true;
+  P.toast("广告来源：跳过弹窗，直接进转盘（模拟）"); P.go("login.html", 1400);
+};
+document.getElementById("sim-10").onclick = function () {
+  document.getElementById("age").hidden = false; P.toast("登录已超过 10 分钟，刷新后重新弹出（模拟）");
+};
+</script>
+</body>
+</html>

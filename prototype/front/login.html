@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>登录注册页 · 注册登录原型</title>
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="with-nav">
+<div class="proto">
+  <div class="proto-head">
+    <p class="muted" style="margin:0">原型页面 › 前台页面</p>
+    <h1>登录注册页</h1>
+  </div>
+
+  <div class="phone"><div class="screen">
+    <div class="sb"><span>9:41</span><span>5G ▮▮▮</span></div>
+    <section class="view">
+      <div class="banner">New members: register in 30 seconds</div>
+      <div class="logo">789<b>.</b></div>
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-otp" aria-selected="true">Verification code</button>
+        <button role="tab" id="tab-pwd" aria-selected="false">Password</button>
+      </div>
+
+      <div id="pane-otp" style="display:grid;gap:10px">
+        <div class="field">
+          <label for="phone">Mobile number</label>
+          <div class="inp" id="phone-box"><span class="pre">+63</span><input id="phone" inputmode="numeric" placeholder="09XX XXX XXXX" autocomplete="off"><button type="button" class="x" id="phone-x" aria-label="清空">×</button></div>
+          <div class="err" id="phone-err"></div>
+        </div>
+        <div class="field" id="ref-field" hidden>
+          <label for="ref">Referral Code</label>
+          <div class="inp dis"><input id="ref" value="INV-A1B2" readonly></div>
+        </div>
+        <button class="btn" id="send">Send code</button>
+      </div>
+
+      <div id="pane-pwd" style="display:none;gap:10px">
+        <div class="field">
+          <label for="acc">Account</label>
+          <div class="inp" id="acc-box"><input id="acc" maxlength="21" placeholder="Phone/GCash/Maya" autocomplete="off"><button type="button" class="x" id="acc-x" aria-label="清空">×</button></div>
+          <div class="err" id="acc-err"></div>
+        </div>
+        <div class="field">
+          <label for="pwd">Password</label>
+          <div class="inp" id="pwd-box"><input id="pwd" type="password" maxlength="16" placeholder="8–16 characters, letters and numbers"></div>
+          <div class="err" id="pwd-err"></div>
+        </div>
+        <div class="row"><a class="link" href="forgot-password.html">Forgot password?</a><button class="link" type="button" id="to-otp">Log in with code</button></div>
+        <button class="btn" id="login">Log in</button>
+      </div>
+
+      <label class="chk"><input type="checkbox" id="agree"><span>I agree to 789's <a href="#" onclick="return false">Terms</a> and <a href="#" onclick="return false">Privacy Policy</a>, and I am 21 or older.</span></label>
+      <div class="or">or continue with</div>
+      <div class="sso" id="sso"></div>
+      <p class="foot">PAGCOR licensed · 21+ only · Gambling can be addictive. Play responsibly.</p>
+    </section>
+
+    <div class="ov" id="ov" hidden><div class="dlg"><h3 id="ov-t"></h3><p class="hint" id="ov-p" style="margin:0"></p><button class="btn" id="ov-ok">OK</button></div></div>
+    <div class="toast" id="toast" hidden></div>
+  </div></div>
+
+  <aside class="notes" aria-label="规则批注">
+    <h2>规则批注</h2>
+    <p class="sub">对应 PRD 功能点 F02。<a href="../../docs/prd.html#pg-F02">查看 PRD</a></p>
+    <ol>
+      <li><span class="fp">F02-01</span>手机号 09 开头、11 位；获得焦点自动填 "0"，输入 009 时去掉多余的 0；点 × 清空后立即提示 "This field is required"。<span class="ref">平台知识库 4.1 -3383</span></li>
+      <li><span class="fp">F02-01</span>格式错误统一提示 "Please enter a mobile number starting with 09."（N4，待评审）。11 位长度提示为示意。<span class="ref">C4</span></li>
+      <li><span class="fp">F02-02</span>账号 hint "Phone/GCash/Maya"，最长 20 位，超长提示 "Content cannot exceed 20 characters"。<span class="ref">-3383</span></li>
+      <li><span class="fp">F02-02</span>账密错误提示剩余次数（英文为示意）；同一账号 5 分钟内失败 3 次触发图片验证。原型演示密码：abc12345。<span class="ref">平台知识库 4.1</span></li>
+      <li><span class="fp">F02-03</span>未勾选条款不能发送验证码、不能发起三方登录（N3）。默认是否勾选看后台开关（C5）。Referral Code 只在邀请链接进入时显示，自动带入且不可改。</li>
+      <li><span class="fp">F02-04</span>记住上次的登录方式和账号，两种方式回填同一账号。<span class="ref">-4548</span></li>
+      <li><span class="fp">F02-05</span>两次登录至少间隔 30s。<span class="warn-2">※ 前后端都要拦截。</span><span class="ref">-5069</span></li>
+      <li><span class="fp">F02-06</span>三方入口：Google、Facebook、Telegram；iOS 另有 Apple。App 端是否隐藏 Google 和 Apple 待 Q3 确认。<span class="ref">-4956 -6093</span></li>
+      <li><span class="fp">F02-07</span>停用、冻结、强更 2615、H5 海外 IP 的拦截，用下方模拟按钮演示；这几个弹窗的英文为示意，正式文案资料未覆盖。2615 不计入登录失败次数。<span class="ref">-3212 -4492 backend/1158698</span></li>
+    </ol>
+    <h3>模拟操作</h3>
+    <div class="sim">
+      <label>端 <select id="sim-plat"><option>H5</option><option>iOS</option><option>Flutter</option></select></label>
+      <label><input type="checkbox" id="sim-terms"> 后台开关：条款默认勾选</label>
+      <label><input type="checkbox" id="sim-inv"> 通过邀请链接进入</label>
+      <label><input type="checkbox" id="sim-reg"> 该手机号已注册（不勾选 = 新用户）</label>
+      <label><input type="checkbox" id="sim-long"> 账号长时间未登录（密码登录后需短信验证）</label>
+      <button type="button" data-st="deactivated"><span class="simtag">模拟</span>账号已停用（自我排除）</button>
+      <button type="button" data-st="frozen"><span class="simtag">模拟</span>账号已冻结</button>
+      <button type="button" id="sim-2615"><span class="simtag">模拟</span>老版本 App 登录（返回 2615）</button>
+      <button type="button" id="sim-ip"><span class="simtag">模拟</span>H5 海外 IP 访问</button>
+      <button type="button" id="sim-reset"><span class="simtag">模拟</span>清空原型状态</button>
+    </div>
+    <div class="pager"><a href="age-gate.html">← 上一页：21 岁确认弹窗</a><a href="captcha.html">下一页：人机验证 →</a></div>
+  </aside>
+</div>
+</div>
+<script>window.NAV_ROOT = "../../";</script>
+<script src="../../assets/nav-data.js"></script>
+<script src="../../assets/nav.js"></script>
+<script src="../../assets/proto.js"></script>
+<script>
+var $ = function (id) { return document.getElementById(id); };
+var plat = P.get("platform");
+
+function setTab(t) {
+  $("tab-otp").setAttribute("aria-selected", t === "otp");
+  $("tab-pwd").setAttribute("aria-selected", t === "pwd");
+  $("pane-otp").style.display = t === "otp" ? "grid" : "none";
+  $("pane-pwd").style.display = t === "pwd" ? "grid" : "none";
+}
+$("tab-otp").onclick = function () { setTab("otp"); };
+$("tab-pwd").onclick = function () { setTab("pwd"); };
+$("to-otp").onclick = function () { setTab("otp"); };
+
+function dialog(t, p, after) {
+  $("ov-t").textContent = t; $("ov-p").textContent = p; $("ov").hidden = false;
+  $("ov-ok").onclick = function () { $("ov").hidden = true; if (after) after(); };
+}
+
+function renderSSO() {
+  var list = ["Google", "Facebook", "Telegram"];
+  if (plat === "iOS") list.push("Apple");
+  var icon = { Google: "G", Facebook: "f", Telegram: "✈", Apple: "" };
+  $("sso").innerHTML = list.map(function (n) { return '<button type="button" data-sso="' + n + '"><i>' + icon[n] + "</i>" + n + "</button>"; }).join("");
+}
+
+/* 初始化：记住的登录方式和账号、条款默认值、邀请码 */
+$("agree").checked = P.get("termsDefault");
+$("ref-field").hidden = !P.get("viaInvite");
+if (P.get("lastAccount")) { $("phone").value = P.get("lastAccount"); $("acc").value = P.get("lastAccount"); }
+setTab(P.get("lastMethod"));
+renderSSO();
+
+P.bindPhone($("phone"), $("phone-box"), $("phone-err"), $("phone-x"));
+$("acc").addEventListener("input", function () {
+  if ($("acc").value.length > 20) { $("acc").value = $("acc").value.slice(0, 20); $("acc-err").textContent = "Content cannot exceed 20 characters"; $("acc-box").classList.add("bad"); }
+  else { $("acc-err").textContent = ""; $("acc-box").classList.remove("bad"); }
+});
+$("acc-x").onclick = function () { $("acc").value = ""; $("acc-err").textContent = "This field is required"; $("acc-box").classList.add("bad"); };
+
+function blockedByStatus() {
+  var st = P.get("status");
+  if (st === "deactivated") { dialog("Account unavailable", "This account is self-excluded and cannot log in.（文案资料未覆盖，见 Q7）"); return true; }
+  return false;
+}
+function needTerms() {
+  if ($("agree").checked) return false;
+  P.toast("Please agree to the Terms first"); return true;
+}
+
+$("send").onclick = function () {
+  if (!P.check($("phone"), $("phone-box"), $("phone-err"))) return;
+  if (needTerms() || blockedByStatus()) return;
+  P.set("phone", $("phone").value.trim());
+  P.set("otpPurpose", "login"); P.set("captchaMode", "otp"); P.set("sso", "");
+  P.go("captcha.html");
+};
+
+$("login").onclick = function () {
+  var a = $("acc").value.trim(), p = $("pwd").value;
+  $("acc-err").textContent = a ? "" : "This field is required"; $("acc-box").classList.toggle("bad", !a);
+  $("pwd-err").textContent = p ? "" : "This field is required"; $("pwd-box").classList.toggle("bad", !p);
+  if (!a || !p) return;
+  if (needTerms()) return;
+  var now = Date.now();
+  if (now - P.get("lastLogin") < 30000) { P.toast("Please wait at least 30 seconds before logging in again."); return; }
+  P.set("lastLogin", now);
+  if (blockedByStatus()) return;
+  if (p !== "abc12345") {
+    var f = P.get("pwdFails") + 1; P.set("pwdFails", f);
+    if (f >= 3) { P.toast("Too many failed attempts. Please complete verification."); P.set("captchaMode", "risk"); P.set("lastAccount", a); P.go("captcha.html", 900); return; }
+    $("pwd-err").textContent = "Incorrect account or password. " + (5 - f) + " attempts left";
+    $("pwd-box").classList.add("bad"); return;
+  }
+  P.set("pwdFails", 0); P.set("lastMethod", "pwd"); P.set("lastAccount", a); P.set("sso", ""); P.set("phoneBound", true);
+  if (P.get("longInactive")) { P.set("otpPurpose", "login"); P.set("captchaMode", "otp"); P.toast("Long time no see. Please verify with SMS code."); P.go("captcha.html", 1000); return; }
+  P.toast("Log in successful"); P.go("home.html", 700);
+};
+
+$("sso").addEventListener("click", function (e) {
+  var b = e.target.closest("[data-sso]"); if (!b) return;
+  if (needTerms() || blockedByStatus()) return;
+  var n = b.dataset.sso;
+  P.toast("Redirecting to " + n + "…（模拟授权）");
+  P.set("sso", n); P.set("phoneBound", false);
+  P.go("bind-phone.html", 1000);
+});
+
+/* 模拟面板 */
+$("sim-plat").value = plat;
+$("sim-plat").onchange = function () { plat = this.value; P.set("platform", plat); renderSSO(); };
+$("sim-terms").checked = P.get("termsDefault");
+$("sim-terms").onchange = function () { P.set("termsDefault", this.checked); $("agree").checked = this.checked; };
+$("sim-inv").checked = P.get("viaInvite");
+$("sim-inv").onchange = function () { P.set("viaInvite", this.checked); $("ref-field").hidden = !this.checked; };
+$("sim-reg").checked = P.get("registered");
+$("sim-reg").onchange = function () { P.set("registered", this.checked); };
+$("sim-long").checked = P.get("longInactive");
+$("sim-long").onchange = function () { P.set("longInactive", this.checked); };
+document.querySelectorAll("[data-st]").forEach(function (b) {
+  b.onclick = function () { P.set("status", b.dataset.st); P.toast(b.dataset.st === "frozen" ? "已设为冻结：可登录，操作时弹窗（见登录成功页）" : "已设为停用：登录时拦截"); };
+});
+$("sim-2615").onclick = function () { dialog("Update required", "Please update to the latest version to continue."); };
+$("sim-ip").onclick = function () { dialog("Service unavailable in your region", "Access from your current location is restricted.（拦截页文案为示意）"); };
+$("sim-reset").onclick = function () { P.reset(); location.reload(); };
+</script>
+</body>
+</html>
